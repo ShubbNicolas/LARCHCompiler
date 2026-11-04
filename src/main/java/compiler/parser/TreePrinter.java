@@ -155,6 +155,13 @@ public final class TreePrinter {
         if (expression instanceof Ast.Negate n) {
             return "~" + expr(n.operand());
         }
+        if (expression instanceof Ast.SetLit s) {
+            if (s.elements().isEmpty()) {
+                return "{ }";
+            }
+            return "{ " + String.join(", ", s.elements().stream()
+                    .map(TreePrinter::expr).toList()) + " }";
+        }
         if (expression instanceof Ast.Conditional c) {
             return "if " + expr(c.condition()) + " then " + expr(c.whenTrue())
                     + " else " + expr(c.whenFalse());

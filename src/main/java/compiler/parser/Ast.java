@@ -119,7 +119,15 @@ public final class Ast {
     public record Equation(Expr left, Expr right) {
     }
 
-    public sealed interface Expr permits Num, Text, Name, Apply, Infix, Negate, Conditional {
+    public sealed interface Expr
+            permits Num, Text, Name, Apply, Infix, Negate, Conditional, SetLit {
+    }
+
+    /** 集合/袋字面量，如 {@code { }} 或 {@code { 1, 2 }}。 */
+    public record SetLit(List<Expr> elements) implements Expr {
+        public SetLit {
+            elements = List.copyOf(elements);
+        }
     }
 
     public record Num(int value) implements Expr {

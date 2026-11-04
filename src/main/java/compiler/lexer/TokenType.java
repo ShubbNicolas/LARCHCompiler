@@ -25,6 +25,9 @@ public enum TokenType {
 
     LPAREN,
     RPAREN,
+    /** 集合/袋字面量的花括号 */
+    LBRACE,
+    RBRACE,
     COMMA,
     COLON,
     SEMICOLON,

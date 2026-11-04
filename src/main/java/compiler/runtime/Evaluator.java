@@ -34,6 +34,18 @@ public final class Evaluator {
         if (expr instanceof Ast.Name n) {
             return evalName(n.id(), env);
         }
+        if (expr instanceof Ast.SetLit set) {
+            List<Integer> items = new ArrayList<>();
+            for (Ast.Expr element : set.elements()) {
+                Value v = eval(element, env);
+                if (v instanceof Value.IntVal i) {
+                    items.add(i.value());
+                } else {
+                    return new Value.Unknown("集合字面量元素必须是整数");
+                }
+            }
+            return new Value.ListVal(items);
+        }
         if (expr instanceof Ast.Apply a) {
             return apply(a, env);
         }
@@ -93,6 +105,7 @@ public final class Evaluator {
                 case "head" -> head(args);
                 case "tail" -> tail(args);
                 case "count" -> count(args);
+                case "rangeCount" -> rangeCount(args);
                 case "isEmpty" -> isEmpty(args);
                 case "size" -> size(args);
                 default -> new Value.Unknown("未实现的算子 " + apply.function());
@@ -181,6 +194,23 @@ public final class Evaluator {
         int n = 0;
         for (int value : list.items()) {
             if (value == item) {
+                n++;
+            }
+        }
+        return new Value.IntVal(n);
+    }
+
+    /** 区间计数：统计序列中满足 lo ≤ x ≤ hi 的元素个数（Bag2 的 rangeCount）。 */
+    private static Value rangeCount(List<Value> args) {
+        if (args.size() != 3) {
+            return new Value.Unknown("rangeCount 需要 3 个参数");
+        }
+        int lo = ((Value.IntVal) args.get(0)).value();
+        int hi = ((Value.IntVal) args.get(1)).value();
+        Value.ListVal list = (Value.ListVal) args.get(2);
+        int n = 0;
+        for (int value : list.items()) {
+            if (lo <= value && value <= hi) {
                 n++;
             }
         }

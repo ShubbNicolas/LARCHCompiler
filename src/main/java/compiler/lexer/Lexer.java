@@ -93,6 +93,8 @@ public final class Lexer {
 
             if (c == '(') { advance(); tokens.add(new Token(TokenType.LPAREN, "(", startLine, startColumn)); continue; }
             if (c == ')') { advance(); tokens.add(new Token(TokenType.RPAREN, ")", startLine, startColumn)); continue; }
+            if (c == '{') { advance(); tokens.add(new Token(TokenType.LBRACE, "{", startLine, startColumn)); continue; }
+            if (c == '}') { advance(); tokens.add(new Token(TokenType.RBRACE, "}", startLine, startColumn)); continue; }
             if (c == ',') { advance(); tokens.add(new Token(TokenType.COMMA, ",", startLine, startColumn)); continue; }
             if (c == ':') { advance(); tokens.add(new Token(TokenType.COLON, ":", startLine, startColumn)); continue; }
             if (c == ';') { advance(); tokens.add(new Token(TokenType.SEMICOLON, ";", startLine, startColumn)); continue; }

@@ -538,6 +538,19 @@ public final class Parser {
             advance();
             return new Ast.Text(token.lexeme());
         }
+        if (check(TokenType.LBRACE)) {
+            advance();
+            List<Ast.Expr> elements = new ArrayList<>();
+            if (!check(TokenType.RBRACE)) {
+                elements.add(parseExpr());
+                while (check(TokenType.COMMA)) {
+                    advance();
+                    elements.add(parseExpr());
+                }
+            }
+            expect(TokenType.RBRACE, "期望 '}'");
+            return new Ast.SetLit(elements);
+        }
         if (check(TokenType.LPAREN)) {
             advance();
             Ast.Expr inner = parseExpr();

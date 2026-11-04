@@ -29,7 +29,7 @@ public final class Domains {
                     tab(0, 0),
                     tab(0, 1),
                     tab(1, 0));
-            case "C", "Container", "Q" -> List.of(
+            case "C", "Container", "Q", "B", "Bag" -> List.of(
                     list(),
                     list(0),
                     list(1),
