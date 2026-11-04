@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,11 +6,11 @@
 
     <groupId>com.larch</groupId>
     <artifactId>larch-compiler</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>LARCH Compiler</name>
-    <description>LARCH 语言集成开发环境：词法分析、语法分析、解释执行与 Swing 界面</description>
+    <description>LARCH 璇█闆嗘垚寮€鍙戠幆澧冿細璇嶆硶鍒嗘瀽銆佽娉曞垎鏋愩€佽В閲婃墽琛屼笌 Swing 鐣岄潰</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

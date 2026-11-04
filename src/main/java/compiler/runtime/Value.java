@@ -1,17 +1,25 @@
 package compiler.runtime;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * 求值过程中出现的值。
  *
- * <p>LSL 没有执行语义，这里用一个内置参考模型给算子赋值：
- * {@code Tab} 用 {@code Map<Integer,Integer>} 表示，其余排序用整数/布尔。</p>
+ * <p>LSL 没有执行语义，这里用内置参考模型给各排序赋值：</p>
+ * <ul>
+ *   <li>{@code Tab} → {@code Map<Integer,Integer>}</li>
+ *   <li>{@code C} / {@code Container} → 整数列表</li>
+ *   <li>{@code Str} → 整数列表（把字符编码成整数）</li>
+ *   <li>{@code Int} / {@code Ind} / {@code Val} / {@code E} → 整数</li>
+ *   <li>{@code Bool} → 布尔</li>
+ * </ul>
  */
 public sealed interface Value
-        permits Value.IntVal, Value.BoolVal, Value.MapVal, Value.Undefined, Value.Unknown {
+        permits Value.IntVal, Value.BoolVal, Value.MapVal, Value.ListVal,
+                Value.Undefined, Value.Unknown {
 
-    /** 整数（Int / Ind / Val 都按整数枚举）。 */
+    /** 整数。 */
     record IntVal(int value) implements Value {
     }
 
@@ -26,14 +34,34 @@ public sealed interface Value
         }
     }
 
-    /**
-     * 未定义（如 lookup 查询不存在的键）。
-     * 两个 Undefined 视为相等，用于「等式的两边都无定义」这种合法情况。
-     */
+    /** 序列（容器 / 字符串）的实现：整数列表。 */
+    record ListVal(List<Integer> items) implements Value {
+        public ListVal {
+            items = List.copyOf(items);
+        }
+
+        public int size() {
+            return items.size();
+        }
+
+        public boolean isEmpty() {
+            return items.isEmpty();
+        }
+
+        public int head() {
+            return items.get(0);
+        }
+
+        public ListVal tail() {
+            return new ListVal(items.subList(1, items.size()));
+        }
+    }
+
+    /** 未定义（lookup 未命中、head/tail 作用于空序列）。两个 Undefined 视为相等。 */
     record Undefined(String what) implements Value {
     }
 
-    /** 无法求值（未实现算子、类型不匹配等），检查结果记为 UNKNOWN。 */
+    /** 无法求值，检查结果记为 UNKNOWN。 */
     record Unknown(String reason) implements Value {
     }
 
@@ -47,6 +75,9 @@ public sealed interface Value
         }
         if (value instanceof MapVal m) {
             return m.entries().toString();
+        }
+        if (value instanceof ListVal l) {
+            return l.items().toString();
         }
         if (value instanceof Undefined u) {
             return "⊥(" + u.what() + ")";

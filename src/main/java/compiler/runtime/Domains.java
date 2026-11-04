@@ -17,13 +17,10 @@ public final class Domains {
 
     public static List<Value> of(String sort) {
         return switch (sort) {
-            case "Int", "Nat", "Ind" -> List.of(
+            case "Int", "Nat", "Ind", "Val", "E" -> List.of(
                     new Value.IntVal(0),
                     new Value.IntVal(1),
                     new Value.IntVal(2));
-            case "Val" -> List.of(
-                    new Value.IntVal(0),
-                    new Value.IntVal(1));
             case "Bool" -> List.of(
                     new Value.BoolVal(false),
                     new Value.BoolVal(true));
@@ -32,6 +29,18 @@ public final class Domains {
                     tab(0, 0),
                     tab(0, 1),
                     tab(1, 0));
+            case "C", "Container", "Q" -> List.of(
+                    list(),
+                    list(0),
+                    list(1),
+                    list(0, 0),
+                    list(0, 1));
+            case "Str" -> List.of(
+                    list(),
+                    list(0),
+                    list(1),
+                    list(0, 0),
+                    list(0, 1));
             default -> List.of(new Value.Unknown("未知排序 " + sort));
         };
     }
@@ -44,5 +53,13 @@ public final class Domains {
         Map<Integer, Integer> map = new LinkedHashMap<>();
         map.put(key, value);
         return new Value.MapVal(map);
+    }
+
+    private static Value.ListVal list(int... items) {
+        List<Integer> values = new java.util.ArrayList<>();
+        for (int item : items) {
+            values.add(item);
+        }
+        return new Value.ListVal(values);
     }
 }
