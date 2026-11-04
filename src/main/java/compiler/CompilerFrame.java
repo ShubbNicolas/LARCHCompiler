@@ -856,14 +856,17 @@ public class CompilerFrame extends JFrame{
 				appendConsole("语法错误，已中止检查，详见「错误列表」。\n");
 				return;
 			}
-			List<CheckResult> results = EquationChecker.check(parsed.trait());
-			appendConsole(EquationChecker.report(results));
-			if (results.stream().anyMatch(r -> r.status() != CheckResult.Status.PASS)) {
+			boolean anyFailed = false;
+			for (compiler.parser.Ast.Trait trait : parsed.traits()) {
+				appendConsole("== " + trait.name() + " ==\n");
+				List<CheckResult> results = EquationChecker.check(trait);
+				appendConsole(EquationChecker.report(results));
+				anyFailed |= results.stream().anyMatch(r -> r.status() != CheckResult.Status.PASS);
+			}
+			if (anyFailed) {
 				proAndConPanel.setSelectedIndex(1);
 			}
-		}
-
-		// 词法分析：把当前编辑区的 token 填进右侧「词法分析」表
+		}		// 词法分析：把当前编辑区的 token 填进右侧「词法分析」表
 		public void lex() {
 			String source = currentSource();
 			if (source == null) {
@@ -896,9 +899,14 @@ public class CompilerFrame extends JFrame{
 				return;
 			}
 			ParseResult result = Parser.parse(source);
-			PARSE_AREA.setText(result.hasErrors()
-					? "解析失败:\n" + joinProblems(result.errors())
-					: TreePrinter.render(result.trait()));
+			String text;
+			if (result.hasErrors()) {
+				text = "解析失败:\n" + joinProblems(result.errors());
+			} else {
+				text = String.join("\n", result.traits().stream()
+						.map(TreePrinter::render).toList());
+			}
+			PARSE_AREA.setText(text);
 			PARSE_AREA.setCaretPosition(0);
 			tabbedPanel.setSelectedIndex(1);
 			showProblems(result.errors());

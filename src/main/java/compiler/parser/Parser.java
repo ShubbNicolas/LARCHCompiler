@@ -36,7 +36,7 @@ import java.util.Set;
 public final class Parser {
 
     private static final Set<String> SECTION_KEYWORDS = Set.of("introduces", "asserts", "includes",
-            "implies", "assumes", "sort", "operators");
+            "implies", "assumes", "sort", "operators", "converts", "exempting");
 
     private final List<Token> tokens;
     private final List<ParseError> errors = new ArrayList<>();
@@ -54,8 +54,19 @@ public final class Parser {
         for (LexError e : lex.errors()) {
             parser.errors.add(new ParseError(e.line(), e.column(), "词法错误: " + e.message()));
         }
-        Ast.Trait trait = parser.parseTrait();
-        return new ParseResult(trait, parser.errors);
+        List<Ast.Trait> traits = new ArrayList<>();
+        while (!parser.check(TokenType.EOF)) {
+            Ast.Trait trait = parser.parseTrait();
+            if (trait != null) {
+                traits.add(trait);
+            } else {
+                break;
+            }
+        }
+        if (traits.isEmpty() && parser.errors.isEmpty()) {
+            parser.errors.add(new ParseError(1, 1, "空输入：期望 trait 声明"));
+        }
+        return new ParseResult(traits, parser.errors);
     }
 
     // ------------------------------------------------------------------
@@ -88,7 +99,7 @@ public final class Parser {
 
             List<Ast.Section> sections = new ArrayList<>();
             List<Ast.Ref> implied = new ArrayList<>();
-            while (!check(TokenType.EOF)) {
+            while (!check(TokenType.EOF) && !looksLikeTraitHeader()) {
                 Token token = peek();
                 if (keywordIs(token, "introduces")) {
                     sections.add(parseIntroduces());
@@ -98,12 +109,22 @@ public final class Parser {
                     sections.add(parseIncludes());
                 } else if (keywordIs(token, "assumes")) {
                     sections.add(parseAssumes());
+                } else if (keywordIs(token, "converts")) {
+                    advance();
+                    sections.add(parseConverts());
+                } else if (keywordIs(token, "exempting")) {
+                    advance();
+                    sections.add(parseExempting());
                 } else if (keywordIs(token, "implies")) {
                     advance();
-                    implied.add(parseRef());
-                    while (check(TokenType.COMMA)) {
-                        advance();
+                    if (looksLikeVarDecl()) {
+                        sections.add(parseImpliesBody());
+                    } else {
                         implied.add(parseRef());
+                        while (check(TokenType.COMMA)) {
+                            advance();
+                            implied.add(parseRef());
+                        }
                     }
                 } else {
                     error(token, "期望段关键字（introduces / asserts / includes / assumes / implies）");
@@ -153,7 +174,7 @@ public final class Parser {
         return new Ast.Assumes(refs);
     }
 
-    /** 解析一个可能带实参的名称引用，如 {@code TotalOrder(E)}。 */
+    /** 解析一个可能带实参或重命名实例化的名称引用，如 {@code TotalOrder(E)}、{@code Container(Q for C)}。 */
     private Ast.Ref parseRef() {
         Token token = peek();
         if (token.type() != TokenType.IDENT
@@ -162,19 +183,84 @@ public final class Parser {
             throw new ParseException(token, "期望名称");
         }
         advance();
+
         List<String> args = new ArrayList<>();
+        List<Ast.Rename> renames = new ArrayList<>();
         if (check(TokenType.LPAREN)) {
             advance();
             if (!check(TokenType.RPAREN)) {
-                args.add(expect(TokenType.IDENT, "期望实参").lexeme());
+                parseRefArgument(args, renames);
                 while (check(TokenType.COMMA)) {
                     advance();
-                    args.add(expect(TokenType.IDENT, "期望实参").lexeme());
+                    parseRefArgument(args, renames);
                 }
             }
             expect(TokenType.RPAREN, "期望 ')'");
         }
-        return new Ast.Ref(token.lexeme(), args);
+        return new Ast.Ref(token.lexeme(), args, renames);
+    }
+
+    private void parseRefArgument(List<String> args, List<Ast.Rename> renames) {
+        String first = expect(TokenType.IDENT, "期望实参").lexeme();
+        if (keywordIs(peek(), "for")) {
+            advance();
+            String second = expect(TokenType.IDENT, "期望 'for' 之后的名称").lexeme();
+            renames.add(new Ast.Rename(first, second));
+        } else {
+            args.add(first);
+        }
+    }
+
+    /** {@code converts isEmpty, count}（已消费 converts 关键字）。 */
+    private Ast.Converts parseConverts() {
+        List<Ast.Ref> operators = new ArrayList<>();
+        if (canStartRef()) {
+            operators.add(parseRef());
+        }
+        while (check(TokenType.COMMA)) {
+            advance();
+            if (!canStartRef() || isSectionStart(peek())) {
+                break;
+            }
+            operators.add(parseRef());
+        }
+        return new Ast.Converts(operators);
+    }
+
+    /** {@code exempting head(empty), tail(empty)}（已消费 exempting 关键字）。 */
+    private Ast.Exempting parseExempting() {
+        List<Ast.Ref> cases = new ArrayList<>();
+        if (canStartRef()) {
+            cases.add(parseRef());
+        }
+        while (check(TokenType.COMMA)) {
+            advance();
+            if (!canStartRef() || isSectionStart(peek())) {
+                break;
+            }
+            cases.add(parseRef());
+        }
+        return new Ast.Exempting(cases);
+    }
+
+    /** {@code implies} 公式块（已消费 implies 关键字）。 */
+    private Ast.Implies parseImpliesBody() {
+        List<Ast.VarDecl> variables = parseVarDecl();
+        List<Ast.Equation> equations = new ArrayList<>();
+        while (!check(TokenType.EOF) && !isSectionStart(peek())) {
+            try {
+                equations.add(parseEquation());
+            } catch (ParseException e) {
+                errors.add(new ParseError(e.token.line(), e.token.column(), e.getMessage()));
+                skipToEquationEnd();
+            }
+        }
+        return new Ast.Implies(variables, equations);
+    }
+
+    private boolean canStartRef() {
+        TokenType type = peek().type();
+        return type == TokenType.IDENT || type == TokenType.KEYWORD || type == TokenType.OPERATOR;
     }
 
     private Ast.Asserts parseAsserts() {
@@ -182,17 +268,37 @@ public final class Parser {
 
         // 生成子句：Str generated by empty, -|
         List<Ast.Ref> generatedBy = new ArrayList<>();
-        while (check(TokenType.IDENT) && keywordIs(peek(1), "generated")) {
-            advance(); // 排序名
-            advance(); // generated
-            expectKeyword("by", "期望 'by'");
-            generatedBy.add(parseRef());
-            while (check(TokenType.COMMA)) {
-                advance();
+        // 划分子句：C partitioned by isEmpty, head, tail
+        String partitionedSort = null;
+        List<Ast.Ref> partitionedBy = new ArrayList<>();
+
+        while (true) {
+            if (check(TokenType.IDENT) && keywordIs(peek(1), "generated")) {
+                advance(); // 排序名
+                advance(); // generated
+                expectKeyword("by", "期望 'by'");
                 generatedBy.add(parseRef());
-            }
-            if (check(TokenType.SEMICOLON)) {
-                advance();
+                while (check(TokenType.COMMA)) {
+                    advance();
+                    generatedBy.add(parseRef());
+                }
+                if (check(TokenType.SEMICOLON)) {
+                    advance();
+                }
+            } else if (check(TokenType.IDENT) && keywordIs(peek(1), "partitioned")) {
+                partitionedSort = advance().lexeme();
+                advance(); // partitioned
+                expectKeyword("by", "期望 'by'");
+                partitionedBy.add(parseRef());
+                while (check(TokenType.COMMA)) {
+                    advance();
+                    partitionedBy.add(parseRef());
+                }
+                if (check(TokenType.SEMICOLON)) {
+                    advance();
+                }
+            } else {
+                break;
             }
         }
 
@@ -209,7 +315,7 @@ public final class Parser {
                 skipToEquationEnd();
             }
         }
-        return new Ast.Asserts(generatedBy, variables, equations);
+        return new Ast.Asserts(generatedBy, partitionedSort, partitionedBy, variables, equations);
     }
 
     private List<Ast.VarDecl> parseVarDecl() {
@@ -289,7 +395,17 @@ public final class Parser {
             Ast.Expr whenFalse = parseExpr();
             return new Ast.Conditional(cond, whenTrue, whenFalse);
         }
-        return parseOr();
+        return parseImplication();
+    }
+
+    /** 蕴含：{@code a ⇒ b}，右结合，优先级低于 ∨。 */
+    private Ast.Expr parseImplication() {
+        Ast.Expr left = parseOr();
+        while (checkOperator("⇒")) {
+            advance();
+            left = new Ast.Infix("⇒", left, parseOr());
+        }
+        return left;
     }
 
     private Ast.Expr parseOr() {
@@ -334,8 +450,8 @@ public final class Parser {
 
     private static boolean isCustomOperator(String op) {
         return switch (op) {
-            case "=", "≠", "∈", "∉", "<", ">", "<=", ">=",
-                 "+", "-", "*", "/", "∧", "∨", "~", "→", "==", "=>", "->" -> false;
+            case "=", "≠", "∈", "∉", "<", ">", "<=", ">=", "≤", "≥",
+                 "+", "-", "*", "/", "∧", "∨", "~", "→", "⇒", "⇔", "==", "=>", "->" -> false;
             default -> true;
         };
     }
@@ -412,13 +528,35 @@ public final class Parser {
             return false;
         }
         return switch (token.lexeme()) {
-            case "=", "≠", "∈", "∉", "<", ">", "<=", ">=" -> true;
+            case "=", "≠", "∈", "∉", "<", ">", "<=", ">=", "≤", "≥" -> true;
             default -> false;
         };
     }
 
     private boolean isSectionStart(Token token) {
         return token.type() == TokenType.KEYWORD && SECTION_KEYWORDS.contains(token.lexeme().toLowerCase());
+    }
+
+    /**
+     * 判断当前位置是否是下一个 trait 的头部（{@code Name(...)? : trait}）。
+     * 用于一个文件里包含多个 trait 的情况。
+     */
+    private boolean looksLikeTraitHeader() {
+        if (!check(TokenType.IDENT)) {
+            return false;
+        }
+        int limit = Math.min(index + 10, tokens.size());
+        for (int i = index; i < limit; i++) {
+            Token token = tokens.get(i);
+            if (token.type() == TokenType.SEMICOLON || token.type() == TokenType.EOF) {
+                return false;
+            }
+            if (token.type() == TokenType.COLON && i + 1 < tokens.size()
+                    && keywordIs(tokens.get(i + 1), "trait")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean keywordIs(Token token, String keyword) {

@@ -26,7 +26,8 @@ public final class Lexer {
 
     private static final Set<String> KEYWORDS = Set.of(
             "trait", "sort", "introduces", "operators", "includes", "asserts",
-            "assumes", "implies", "generated", "by", "exempting", "converts",
+            "assumes", "implies", "generated", "by", "partitioned",
+            "converts", "exempting", "for",
             "using", "applied", "when", "if", "then", "else",
             "new", "add", "lookup", "belong");
 
@@ -193,7 +194,7 @@ public final class Lexer {
         }
         char c = peek();
         String single = switch (c) {
-            case '=', '~', '∈', '∉', '≠', '→', '∧', '∨',
+            case '=', '~', '∈', '∉', '≠', '→', '∧', '∨', '≤', '≥', '⇒', '⇔',
                  '<', '>', '+', '-', '*', '/', '|', '&' -> String.valueOf(c);
             default -> null;
         };
