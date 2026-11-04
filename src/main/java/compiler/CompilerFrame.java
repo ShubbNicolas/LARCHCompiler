@@ -4,10 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.StyledDocument;
@@ -15,6 +17,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.undo.UndoManager;
 
 //import structure.TreeNode;
+import compiler.lexer.LexResult;
+import compiler.lexer.Lexer;
+import compiler.lexer.Token;
+import compiler.parser.ParseResult;
+import compiler.parser.Parser;
+import compiler.parser.TreePrinter;
+import compiler.runtime.CheckResult;
+import compiler.runtime.EquationChecker;
 import util.*;
 
 public class CompilerFrame extends JFrame{
@@ -58,6 +68,12 @@ public class CompilerFrame extends JFrame{
 	public static JTextPane consoleArea = new JTextPane();
 	/* 错误显示区 */
 	public static JTextArea problemArea = new JTextArea();
+
+	/* 词法分析结果表 */
+	private static final JTable LEX_TABLE = new JTable();
+
+	/* 语法分析结果文本 */
+	private static final JTextArea PARSE_AREA = new JTextArea();
 	/* 保存和打开对话框 */
 	private FileDialog filedialog_save, filedialog_load;
 	/* Undo管理器 */
@@ -461,7 +477,7 @@ public class CompilerFrame extends JFrame{
 				proAndConPanel = new JTabbedPane();
 				proAndConPanel.setFont(treeFont);
 				proAndConPanel.add(new JScrollPane(consoleArea), "控制台");
-				//proAndConPanel.add(new JScrollPane(problemArea), "错误列表");
+				proAndConPanel.add(new JScrollPane(problemArea), "错误列表");
 
 				editPanel.add(editLabelPanel);
 				editPanel.add(editTabbedPane);
@@ -474,8 +490,12 @@ public class CompilerFrame extends JFrame{
 						768 - TOOLBAR.getHeight() - STATUSBAR.getHeight() - 98);
 
 				// 词法分析结果显示区
-				JScrollPane lexerPanel = new JScrollPane(null);
-				JScrollPane parserPanel = new JScrollPane(null);
+				LEX_TABLE.setFont(treeFont);
+				LEX_TABLE.setAutoCreateRowSorter(true);
+				PARSE_AREA.setFont(treeFont);
+				PARSE_AREA.setEditable(false);
+				JScrollPane lexerPanel = new JScrollPane(LEX_TABLE);
+				JScrollPane parserPanel = new JScrollPane(PARSE_AREA);
 				tabbedPanel = new JTabbedPane(JTabbedPane.TOP,
 						JTabbedPane.SCROLL_TAB_LAYOUT);
 				tabbedPanel.setFont(treeFont);
@@ -647,7 +667,7 @@ public class CompilerFrame extends JFrame{
 						delete();
 					}
 				});
-				/*lexItem.addActionListener(new ActionListener() {
+				lexItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						lex();
 					}
@@ -656,7 +676,7 @@ public class CompilerFrame extends JFrame{
 					public void actionPerformed(ActionEvent arg0) {
 						parse();
 					}
-				});*/
+				});
 				runItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						run();
@@ -725,7 +745,7 @@ public class CompilerFrame extends JFrame{
 						run();
 					}
 				});
-				/*lexButton.addActionListener(new ActionListener() {
+				lexButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						lex();
 					}
@@ -734,7 +754,7 @@ public class CompilerFrame extends JFrame{
 					public void actionPerformed(ActionEvent arg0) {
 						parse();
 					}
-				});*///语法分析
+				});//语法分析
 				undoButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						undo();
@@ -817,13 +837,95 @@ public class CompilerFrame extends JFrame{
 		}
 	}
 	
-	// 运行：分析并运行LARCH程序，显示运行结果
+	// 运行：解析规格并检查 asserts 段的等式
 		public void run() {
-			consoleArea.setText(null);
+			consoleArea.setText("");
 			columnNum = 0;
 			rowNum = 0;
 			presentMaxRow = 0;
 			index = new int[] { 0, 0 };
+
+			String source = currentSource();
+			if (source == null) {
+				appendConsole("没有打开的编辑窗口。\n");
+				return;
+			}
+			ParseResult parsed = Parser.parse(source);
+			if (parsed.hasErrors()) {
+				showProblems(parsed.errors());
+				appendConsole("语法错误，已中止检查，详见「错误列表」。\n");
+				return;
+			}
+			List<CheckResult> results = EquationChecker.check(parsed.trait());
+			appendConsole(EquationChecker.report(results));
+			if (results.stream().anyMatch(r -> r.status() != CheckResult.Status.PASS)) {
+				proAndConPanel.setSelectedIndex(1);
+			}
+		}
+
+		// 词法分析：把当前编辑区的 token 填进右侧「词法分析」表
+		public void lex() {
+			String source = currentSource();
+			if (source == null) {
+				appendConsole("没有打开的编辑窗口。\n");
+				return;
+			}
+			LexResult result = Lexer.tokenize(source);
+			List<Token> tokens = result.tokens();
+			Object[][] rows = new Object[tokens.size()][4];
+			for (int i = 0; i < tokens.size(); i++) {
+				Token t = tokens.get(i);
+				rows[i] = new Object[] { t.type().name(), t.lexeme(), t.line(), t.column() };
+			}
+			LEX_TABLE.setModel(new DefaultTableModel(rows, new String[] { "类型", "词素", "行", "列" }) {
+				private static final long serialVersionUID = 1L;
+
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			});
+			tabbedPanel.setSelectedIndex(0);
+			showProblems(result.errors());
+		}
+
+		// 语法分析：把当前编辑区解析成 AST，渲染到右侧「语法分析」页
+		public void parse() {
+			String source = currentSource();
+			if (source == null) {
+				appendConsole("没有打开的编辑窗口。\n");
+				return;
+			}
+			ParseResult result = Parser.parse(source);
+			PARSE_AREA.setText(result.hasErrors()
+					? "解析失败:\n" + joinProblems(result.errors())
+					: TreePrinter.render(result.trait()));
+			PARSE_AREA.setCaretPosition(0);
+			tabbedPanel.setSelectedIndex(1);
+			showProblems(result.errors());
+		}
+
+		/** 当前选中标签页的文本；没有打开文件时返回 null。 */
+		private String currentSource() {
+			StyleEditor editor = map.get(editTabbedPane.getSelectedComponent());
+			return editor == null ? null : editor.getText();
+		}
+
+		private void appendConsole(String text) {
+			consoleArea.setText(consoleArea.getText() + text);
+		}
+
+		/** 把错误写入「错误列表」，有错误时自动切到该页。 */
+		private void showProblems(List<?> problems) {
+			problemArea.setText(joinProblems(problems));
+			proAndConPanel.setSelectedIndex(problems.isEmpty() ? 0 : 1);
+		}
+
+		private static String joinProblems(List<?> problems) {
+			StringBuilder sb = new StringBuilder();
+			for (Object problem : problems) {
+				sb.append(problem).append('\n');
+			}
+			return sb.toString();
 		}
 
 		// 新建

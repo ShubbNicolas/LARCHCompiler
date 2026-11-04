@@ -20,12 +20,13 @@
 | 字体设置 | ✅ 可用 | 自定义 `JFontDialog` |
 | 光标行列状态栏 | ✅ 可用 | `JStatusBar` |
 | 项目文件树 | ✅ 可用 | 左侧 `JFileTree` |
-| 词法分析 | 🟡 引擎已完成 | `compiler.lexer` 已实现，13 个单测通过；界面按钮仍被注释，未接线 |
-| 语法分析 | 🟡 引擎已完成 | `compiler.parser` 已实现，8 个单测通过；界面按钮仍被注释，未接线 |
-| 运行（F5） | 🟡 引擎已完成 | `compiler.runtime` 等式检查器已实现，Table1 的 6 条等式全部通过；`run()` 仍是空实现，未接线 |
-| LARCH 语句解析 | 🟡 仅命令行 | 旧 `ReaderHelper` 只被 `test` 包调用；新引擎 `compiler.parser` 尚未接入界面 |
+| 词法分析 | ✅ 可用 | 工具栏/菜单已接线，token 表显示在右侧「词法分析」页 |
+| 语法分析 | ✅ 可用 | 递归下降生成 AST，渲染到「语法分析」页 |
+| 运行（F5） | ✅ 可用 | 解析后对 asserts 等式做枚举检查，结果输出到控制台 |
+| 错误列表 | ✅ 可用 | 词法/语法错误带行列定位，有错误时自动切到该页 |
+| LARCH 语句解析 | 🟡 新旧并存 | 旧 `ReaderHelper` 仅 `test` 包在用；界面统一走新引擎 |
 
-对应代码位置：`CompilerFrame.java:728-737`（lex/parse 监听器注释块）、`CompilerFrame.java:821-827`（`run()` 空实现）。
+对应代码位置：`CompilerFrame.java` 的 `lex()` / `parse()` / `run()` 三个方法，以及 `LEX_TABLE`、`PARSE_AREA`、`problemArea` 三处输出。
 
 ## 二、目录结构
 
