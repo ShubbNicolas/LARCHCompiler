@@ -26,7 +26,7 @@ public final class Lexer {
 
     private static final Set<String> KEYWORDS = Set.of(
             "trait", "sort", "introduces", "operators", "includes", "asserts",
-            "assumes", "implies", "generated", "exempting", "converts",
+            "assumes", "implies", "generated", "by", "exempting", "converts",
             "using", "applied", "when", "if", "then", "else",
             "new", "add", "lookup", "belong");
 
@@ -184,7 +184,7 @@ public final class Lexer {
      * 匹配运算符：优先匹配双字符运算符，再退化为单字符。
      */
     private String matchOperator() {
-        String[] twoChar = {"==", "=>", "->", "<=", ">=", "!="};
+        String[] twoChar = {"==", "=>", "->", "-|", "<=", ">=", "!="};
         for (String op : twoChar) {
             if (src.startsWith(op, pos)) {
                 advanceBy(2);
