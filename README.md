@@ -22,8 +22,8 @@
 | 项目文件树 | ✅ 可用 | 左侧 `JFileTree` |
 | 词法分析 | 🟡 引擎已完成 | `compiler.lexer` 已实现，13 个单测通过；界面按钮仍被注释，未接线 |
 | 语法分析 | 🟡 引擎已完成 | `compiler.parser` 已实现，8 个单测通过；界面按钮仍被注释，未接线 |
-| 运行（F5） | ⚠️ **空实现** | `run()` 只清空控制台并重置计数器 |
-| LARCH 语句解析 | 🟡 仅命令行 | 只被 `test` 包调用，界面未接入 |
+| 运行（F5） | 🟡 引擎已完成 | `compiler.runtime` 等式检查器已实现，Table1 的 6 条等式全部通过；`run()` 仍是空实现，未接线 |
+| LARCH 语句解析 | 🟡 仅命令行 | 旧 `ReaderHelper` 只被 `test` 包调用；新引擎 `compiler.parser` 尚未接入界面 |
 
 对应代码位置：`CompilerFrame.java:728-737`（lex/parse 监听器注释块）、`CompilerFrame.java:821-827`（`run()` 空实现）。
 
