@@ -25,10 +25,10 @@ import java.util.Set;
 public final class Lexer {
 
     private static final Set<String> KEYWORDS = Set.of(
-            "trait", "sort", "operators", "includes", "asserts",
+            "trait", "sort", "introduces", "operators", "includes", "asserts",
             "assumes", "implies", "generated", "exempting", "converts",
             "using", "applied", "when", "if", "then", "else",
-            "new", "add", "lookup", "belong", "ind", "val");
+            "new", "add", "lookup", "belong");
 
     private final String src;
     private int pos;
@@ -193,7 +193,8 @@ public final class Lexer {
         }
         char c = peek();
         String single = switch (c) {
-            case '=', '~', '∈', '∧', '∨', '<', '>', '+', '-', '*', '/', '|', '&' -> String.valueOf(c);
+            case '=', '~', '∈', '∉', '≠', '→', '∧', '∨',
+                 '<', '>', '+', '-', '*', '/', '|', '&' -> String.valueOf(c);
             default -> null;
         };
         if (single != null) {
