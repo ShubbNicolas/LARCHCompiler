@@ -118,7 +118,7 @@ public final class Parser {
                 } else if (keywordIs(token, "implies")) {
                     advance();
                     if (isSectionStart(peek()) || check(TokenType.EOF)) {
-                        // 空的 implies 块，如 PairwiseExtension 里紧随 converts
+                        // 允许空的 implies 块（直接跟随下一个子句）
                         sections.add(new Ast.Implies(List.of(), List.of()));
                     } else if (looksLikeVarDecl()) {
                         sections.add(parseImpliesBody());
@@ -214,7 +214,7 @@ public final class Parser {
         }
     }
 
-    /** 接受标识符、关键字或运算符作为名称（如 {@code +}、{@code ⊗}、{@code Int}）。 */
+    /** 接受标识符、关键字或运算符作为名称（如 {@code +}、{@code Int}）。 */
     private String expectName(String message) {
         Token token = peek();
         if (token.type() != TokenType.IDENT
@@ -470,33 +470,12 @@ public final class Parser {
     }
 
     private Ast.Expr parseRelation() {
-        Ast.Expr left = parseCustomInfix();
-        while (isRelationOperator(peek())) {
-            String op = advance().lexeme();
-            left = new Ast.Infix(op, left, parseCustomInfix());
-        }
-        return left;
-    }
-
-    /**
-     * 用户自定义的中缀算子（如 {@code ⊕}），优先级高于关系运算符、低于算术。
-     * 未在内置集合里的运算符都按左结合处理。
-     */
-    private Ast.Expr parseCustomInfix() {
         Ast.Expr left = parseAdditive();
-        while (check(TokenType.OPERATOR) && isCustomOperator(peek().lexeme())) {
+        while (isRelationOperator(peek())) {
             String op = advance().lexeme();
             left = new Ast.Infix(op, left, parseAdditive());
         }
         return left;
-    }
-
-    private static boolean isCustomOperator(String op) {
-        return switch (op) {
-            case "=", "≠", "∈", "∉", "<", ">", "<=", ">=", "≤", "≥",
-                 "+", "-", "*", "/", "∧", "∨", "~", "→", "⇒", "⇔", "==", "=>", "->" -> false;
-            default -> true;
-        };
     }
 
     private Ast.Expr parseAdditive() {

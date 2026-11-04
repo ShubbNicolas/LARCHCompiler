@@ -96,9 +96,9 @@ class StructureCheckTest {
     @DisplayName("算子形参不参与检查（由实例化方提供定义）")
     void operatorParameterSkipped() {
         Ast.Trait t = trait("""
-                P(⊕, E): trait
+                P(+, E): trait
                 introduces
-                  __ ⊕ __: E, E → E
+                  __ + __: E, E → E
                 asserts e1, e2: E
                   e1 == e1
                 """);

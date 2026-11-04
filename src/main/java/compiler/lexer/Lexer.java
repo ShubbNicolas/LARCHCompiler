@@ -197,7 +197,7 @@ public final class Lexer {
         char c = peek();
         String single = switch (c) {
             case '=', '~', '∈', '∉', '≠', '→', '∧', '∨', '≤', '≥', '⇒', '⇔',
-                 '⊕', '⊗', '<', '>', '+', '-', '*', '/', '|', '&' -> String.valueOf(c);
+                 '<', '>', '+', '-', '*', '/', '|', '&' -> String.valueOf(c);
             default -> null;
         };
         if (single != null) {
