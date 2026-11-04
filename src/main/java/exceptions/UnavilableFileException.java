@@ -6,7 +6,7 @@ import java.io.IOException;
 public class UnavilableFileException extends IOException{
 
 	public UnavilableFileException() {
-		super("¶ÁÈ¡´íÎó£ºÎÄ¼ş²»¿ÉÓÃ£¡");
+		super("è¯»å–é”™è¯¯ï¼šæ–‡ä»¶ä¸å¯ç”¨ï¼");
 		
 	}
 

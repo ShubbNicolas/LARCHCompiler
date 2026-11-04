@@ -6,7 +6,7 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- *Ä£ÄâWindowsµÄ×´Ì¬Ìõ
+ *æ¨¡æ‹ŸWindowsçš„çŠ¶æ€æ¡
  * 
  * @version 1.0
  */
@@ -22,7 +22,7 @@ public class JStatusBar extends JComponent implements Serializable {
 	}
 
 	/**
-	 * Ìí¼ÓÒ»¸ö×´Ì¬À¸
+	 * æ·»åŠ ä¸€ä¸ªçŠ¶æ€æ 
 	 * 
 	 * @param width
 	 *            int
@@ -51,7 +51,7 @@ public class JStatusBar extends JComponent implements Serializable {
 	}
 
 	/**
-	 * È¡µÃ×´Ì¬ÌõµÄÀ¸Êı
+	 * å–å¾—çŠ¶æ€æ¡çš„æ æ•°
 	 * 
 	 * @return int
 	 */
@@ -60,12 +60,12 @@ public class JStatusBar extends JComponent implements Serializable {
 	}
 
 	/**
-	 * ÉèÖÃ×´Ì¬ĞÅÏ¢
+	 * è®¾ç½®çŠ¶æ€ä¿¡æ¯
 	 * 
 	 * @param cellIndex
-	 *            int À¸ºÅ
+	 *            int æ å·
 	 * @param status
-	 *            String ×´Ì¬ĞÅÏ¢
+	 *            String çŠ¶æ€ä¿¡æ¯
 	 */
 	public void setStatus(int cellIndex, String status) {
 		if (getLabel(cellIndex) != null)
@@ -73,10 +73,10 @@ public class JStatusBar extends JComponent implements Serializable {
 	}
 
 	/**
-	 * È¡µÃ×´Ì¬À¸
+	 * å–å¾—çŠ¶æ€æ 
 	 * 
 	 * @param cellIndex
-	 *            int À¸ºÅ
+	 *            int æ å·
 	 * @return JLabel
 	 */
 	private JLabel getLabel(int cellIndex) {
@@ -87,10 +87,10 @@ public class JStatusBar extends JComponent implements Serializable {
 	}
 
 	/**
-	 * È¡µÃ×´Ì¬ĞÅÏ¢
+	 * å–å¾—çŠ¶æ€ä¿¡æ¯
 	 * 
 	 * @param cellIndex
-	 *            int À¸ºÅ
+	 *            int æ å·
 	 * @return String
 	 */
 	public String getStatusText(int cellIndex) {

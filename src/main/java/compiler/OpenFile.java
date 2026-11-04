@@ -12,17 +12,17 @@ public class OpenFile {
 	{
 		
 		 JFileChooser fileChooser = new JFileChooser();
-		  //ÉèÖÃµ±Ç°Ä¿Â¼
-		  //ÎÄ¼ş¶Ô»°¿òÏÔÊ¾µÄÊÇµ±Ç°ÏîÄ¿ÎÄ¼şÄ¿Â¼
+		  //è®¾ç½®å½“å‰ç›®å½•
+		  //æ–‡ä»¶å¯¹è¯æ¡†æ˜¾ç¤ºçš„æ˜¯å½“å‰é¡¹ç›®æ–‡ä»¶ç›®å½•
 		  fileChooser.setCurrentDirectory(new File("."));
 		  fileChooser.setAcceptAllFileFilterUsed(false);
-		  //ÉèÖÃÎÄ¼ş¶Ô»°¿òÀïÃæĞèÒªÏÔÊ¾µÄÎÄ¼ş
+		  //è®¾ç½®æ–‡ä»¶å¯¹è¯æ¡†é‡Œé¢éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶
 		  final String[][] fileENames = { 
 				 
 				  { ".larch", "larch(*.larch)" },
-				  { ".txt", "ÎÄ±¾ÎÄ¼ş(*.txt)" },
+				  { ".txt", "æ–‡æœ¬æ–‡ä»¶(*.txt)" },
 		           };
-		  // ÏÔÊ¾ËùÓĞÎÄ¼ş
+		  // æ˜¾ç¤ºæ‰€æœ‰æ–‡ä»¶
 		  fileChooser.addChoosableFileFilter(new FileFilter() {
 		   public boolean accept(File file) {
 			 String p= file.getPath();
@@ -30,10 +30,10 @@ public class OpenFile {
 		    return true;
 		   }
 		   public String getDescription() {
-		    return "ËùÓĞÎÄ¼ş(*.*)";
+		    return "æ‰€æœ‰æ–‡ä»¶(*.*)";
 		   }
 		  });
-		  // Ñ­»·Ìí¼ÓĞèÒªÏÔÊ¾µÄÎÄ¼ş
+		  // å¾ªç¯æ·»åŠ éœ€è¦æ˜¾ç¤ºçš„æ–‡ä»¶
 		  for (final String[] fileEName : fileENames) {
 		   
 		   fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -55,9 +55,9 @@ public class OpenFile {
 		     });
 		  } 
 		  fileChooser.showDialog(null, null);
-		  //Í¨¹ıfilechooser»ñÈ¡ÎÄ¼şµÄÃû×Ö
+		  //é€šè¿‡filechooserè·å–æ–‡ä»¶çš„åå­—
 		  File p=fileChooser.getSelectedFile();
-		  //Í¨¹ıgetAbsolutePath»ñÈ¡ÎÄ¼şµÄ¾ø¶ÔÂ·¾¶
+		  //é€šè¿‡getAbsolutePathè·å–æ–‡ä»¶çš„ç»å¯¹è·¯å¾„
 		  String path = p.getAbsolutePath();
 		  return path;
 	}

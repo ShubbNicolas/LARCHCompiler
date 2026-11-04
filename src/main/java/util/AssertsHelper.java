@@ -2,8 +2,8 @@ package util;
 
 public class AssertsHelper {
 	
-	public static String [] asserts = {"~(i¡Ênew)", 
-			"i¡Êadd(t,i,v) == i=i1 i=e",
+	public static String [] asserts = {"~(iâˆˆnew)", 
+			"iâˆˆadd(t,i,v) == i=i1 i=e",
 			"lookup"};
 	
 	public static void init() {
@@ -32,7 +32,7 @@ public class AssertsHelper {
 				lookupflag++;
 			}
 			
-			//ÅĞ¶Ïº¯ÊıÊÇ·ñ´æÔÚ
+			//åˆ¤æ–­å‡½æ•°æ˜¯å¦å­˜åœ¨
 			if(addflag==1) {
 				functioncase[6] = "add";
 			}

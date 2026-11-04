@@ -2,16 +2,17 @@ package test;
 
 import compiler.ExcuteProgram;
 import compiler.OpenFile;
+import exceptions.FileNotTxtException;
 import util.AssertsHelper;
 import util.ReaderHelper;
 
 public class Test2 {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotTxtException {
 	String results = null;
 	ReaderHelper rhelper=new ReaderHelper();
-    //OpenFileÕâ¸öÀàÖ÷Òª¾ÍÊÇ´ò¿ªÎÄ¼ş¶Ô»°¿ò£¬Ñ¡ÔñÎÄ¼ş£¬·µ»ØÎÄ¼şÂ·¾¶¡£
+    //OpenFileè¿™ä¸ªç±»ä¸»è¦å°±æ˜¯æ‰“å¼€æ–‡ä»¶å¯¹è¯æ¡†ï¼Œé€‰æ‹©æ–‡ä»¶ï¼Œè¿”å›æ–‡ä»¶è·¯å¾„ã€‚
     OpenFile op=new OpenFile();
-    //getPathº¯Êı¾ÍÊÇ·µ»ØÎÄ¼şÂ·¾¶
+    //getPathå‡½æ•°å°±æ˜¯è¿”å›æ–‡ä»¶è·¯å¾„
     String path=op.getPath();
     rhelper.setPath(path);
     rhelper.Assign();
@@ -21,7 +22,7 @@ public class Test2 {
     	System.out.println(rhelper.assertContent[i]);
     } */ 
     
-	//assert²Ù×÷
+	//assertæ“ä½œ
     AssertsHelper ahelper = new AssertsHelper();
     AssertsHelper.asserts = rhelper.assertContent;	
 	

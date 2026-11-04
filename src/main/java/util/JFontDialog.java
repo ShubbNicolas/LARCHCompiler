@@ -8,7 +8,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 /**
- * ×ÖÌåÉèÖÃ¶Ô»°¿ò
+ * å­—ä½“è®¾ç½®å¯¹è¯æ¡†
  * 
  * @version 1.0
  */
@@ -29,12 +29,12 @@ public class JFontDialog extends JDialog
     private JLabel lbSize = new JLabel();
 
     /**
-     * È¡µÃËùÓĞ×ÖÌåÃû
+     * å–å¾—æ‰€æœ‰å­—ä½“å
      */
     String fontNames[] = GraphicsEnvironment.getLocalGraphicsEnvironment().
         getAvailableFontFamilyNames();
     private JList listName = new JList(fontNames);
-    String fontStyles[] = { "³£¹æ","´ÖÌå","Ğ±Ìå","´ÖĞ±Ìå"};
+    String fontStyles[] = { "å¸¸è§„","ç²—ä½“","æ–œä½“","ç²—æ–œä½“"};
     private JList listStyle = new JList(fontStyles);
     String fontSizes[] = {
         "8", "9", "10", "11", "12", "14", "16", "18", "20",
@@ -72,7 +72,7 @@ public class JFontDialog extends JDialog
         return dialog.getFont();
     }
     /**
-     * È¡µÃ¸ù´°¿Ú
+     * å–å¾—æ ¹çª—å£
      * @param c Component
      * @return Window
      */
@@ -122,7 +122,7 @@ public class JFontDialog extends JDialog
 
     private void jbInit() throws Exception {
         this.setSize(480, 310);
-        titledBorder1 = new TitledBorder("Ô¤ÀÀ");
+        titledBorder1 = new TitledBorder("é¢„è§ˆ");
         pCenter.setLayout(null);
         txtName.setBackground(Color.white);
         txtName.setEditable(false);
@@ -139,11 +139,11 @@ public class JFontDialog extends JDialog
         pPreview.setBorder(titledBorder1);
         pPreview.setBounds(new Rectangle(174, 170, 193, 98));
         pPreview.setLayout(null);
-        lbName.setText("Ãû×Ö");
+        lbName.setText("åå­—");
         lbName.setBounds(new Rectangle(15, 4, 151, 17));
-        lbStyle.setText("·ç¸ñ");
+        lbStyle.setText("é£æ ¼");
         lbStyle.setBounds(new Rectangle(174, 4, 123, 17));
-        lbSize.setText("´óĞ¡");
+        lbSize.setText("å¤§å°");
         lbSize.setBounds(new Rectangle(304, 4, 62, 17));
         lbPreview.setBorder(BorderFactory.createLoweredBevelBorder());
         lbPreview.setHorizontalAlignment(SwingConstants.CENTER);
@@ -151,10 +151,10 @@ public class JFontDialog extends JDialog
         lbPreview.setBounds(new Rectangle(10, 23, 171, 61));
         bttOK.setBounds(new Rectangle(379, 21, 79, 22));
         bttOK.setMnemonic('O');
-        bttOK.setText("È·¶¨(O)");
+        bttOK.setText("ç¡®å®š(O)");
         bttCancel.setBounds(new Rectangle(379, 48, 79, 22));
         bttCancel.setMnemonic('C');
-        bttCancel.setText("È¡Ïû(C)");
+        bttCancel.setText("å–æ¶ˆ(C)");
         listName.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listStyle.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listSize.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -188,7 +188,7 @@ public class JFontDialog extends JDialog
 
     public void setFont(Font f) {
         if (f == null)
-            throw new NullPointerException("´íÎó:×ÖÌå²»ÄÜÎª¿Õ!");
+            throw new NullPointerException("é”™è¯¯:å­—ä½“ä¸èƒ½ä¸ºç©º!");
         listName.setSelectedValue(f.getFamily(), true);
         listStyle.setSelectedIndex(f.getStyle());
         listSize.setSelectedValue("" + f.getSize(), true);

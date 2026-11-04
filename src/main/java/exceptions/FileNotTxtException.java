@@ -4,7 +4,7 @@ package exceptions;
 public class FileNotTxtException extends Exception{
 
 	public FileNotTxtException() {
-		super("ÉÏ´«ÀàĞÍ²»ÊÇLarchÎÄ¼ş£¡");
+		super("ä¸Šä¼ ç±»å‹ä¸æ˜¯Larchæ–‡ä»¶ï¼");
 		
 	}
 	

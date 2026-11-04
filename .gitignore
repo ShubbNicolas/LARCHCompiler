@@ -1,5 +1,6 @@
 # Eclipse / Java build output
 bin/
+target/
 
 # VS Code workspace settings
 .vscode/

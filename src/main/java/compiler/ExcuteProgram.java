@@ -20,7 +20,7 @@ public class ExcuteProgram {
     public String [] getline;
     public String [] Funname=new String [10]; //funcname
     public String newCreate;
-	//°´ĞĞ´æÈ¡txtÎÄ¼şÖĞµÄ´úÂë
+	//æŒ‰è¡Œå­˜å–txtæ–‡ä»¶ä¸­çš„ä»£ç 
     
     IntroducesHelper ihelper = new IntroducesHelper(Ind, Val);
     
@@ -28,7 +28,7 @@ public class ExcuteProgram {
 	{
 		this.path=path;
 	}
-	//Éè¼Æº¯Êı£¬ÓÃÀ´É¨ÃètxtÎÄ¼ş¶ÁÈ¡larchÓï¾ä²¢·ÖÅäµ½Ïà¹ØÎ»ÖÃ
+	//è®¾è®¡å‡½æ•°ï¼Œç”¨æ¥æ‰«ætxtæ–‡ä»¶è¯»å–larchè¯­å¥å¹¶åˆ†é…åˆ°ç›¸å…³ä½ç½®
 	public void Run()
 
 	{
@@ -142,13 +142,13 @@ public class ExcuteProgram {
 	}
 	
 /**
- * °´ÕÕĞĞ¶ÁÈ¡txtÎÄ¼ş
+ * æŒ‰ç…§è¡Œè¯»å–txtæ–‡ä»¶
  */
 
         public static String[] readFile(String path) throws IOException{
-            // ÓÃ×Ö·û´®´æÂ·¾¶
+            // ç”¨å­—ç¬¦ä¸²å­˜è·¯å¾„
             String[]txtline = new String[15];
-            //assert txtline != null: "ÎÄ¼şÄ¿Â¼²»¿ÉÓÃ£¡";
+            //assert txtline != null: "æ–‡ä»¶ç›®å½•ä¸å¯ç”¨ï¼";
         
             FileInputStream fis = new FileInputStream(path);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -168,7 +168,7 @@ public class ExcuteProgram {
         }
        
  /**
-  * --É¾³ı³ÌĞòĞĞÖĞÖ¸¶¨µÄ×Ó´®
+  * --åˆ é™¤ç¨‹åºè¡Œä¸­æŒ‡å®šçš„å­ä¸²
   * @param str1 str2
   * @return
   */
@@ -212,7 +212,7 @@ public class ExcuteProgram {
 
     	}    
 /**
- * --É¾³ı³ÌĞòĞĞÖĞµÄ¿Õ¸ñ
+ * --åˆ é™¤ç¨‹åºè¡Œä¸­çš„ç©ºæ ¼
  * @param str1
  * @return
  */    
@@ -224,7 +224,7 @@ public class ExcuteProgram {
 	  }
 	  
 	  /**
-	   * --É¾³ı³ÌĞòĞĞÖĞµÄ¿Õ¸ñ
+	   * --åˆ é™¤ç¨‹åºè¡Œä¸­çš„ç©ºæ ¼
 	   * @param str1
 	   * @return
 	   */

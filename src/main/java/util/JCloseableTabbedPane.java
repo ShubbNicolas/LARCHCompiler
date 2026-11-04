@@ -11,7 +11,7 @@ public class JCloseableTabbedPane extends JTabbedPane implements Serializable {
 	public static final String ON_TAB_CLOSE = "ON_TAB_CLOSE";
 	public static final String ON_TAB_DOUBLECLICK = "ON_TAB_DOUBLECLICK";
 	private JPopupMenu popup = new JPopupMenu();
-	private JMenuItem closeItem = new JMenuItem("¹Ø±Õ");
+	private JMenuItem closeItem = new JMenuItem("å…³é—­");
 
 	public JCloseableTabbedPane() {
 		super();
@@ -74,7 +74,7 @@ public class JCloseableTabbedPane extends JTabbedPane implements Serializable {
 		}
 	}
 
-	// Êó±ê¼àÌıÆ÷
+	// é¼ æ ‡ç›‘å¬å™¨
 	class DefaultMouseAdapter extends MouseAdapter {
 		CloseIcon icon;
 		public void mousePressed(MouseEvent e) {
@@ -118,7 +118,7 @@ public class JCloseableTabbedPane extends JTabbedPane implements Serializable {
 		return super.getIconAt(index);
 	}
 
-	// »­³ö¹Ø±Õ°´Å¥
+	// ç”»å‡ºå…³é—­æŒ‰é’®
 	class CloseIcon implements Icon {
 		Rectangle rec = new Rectangle(0, 0, 15, 16);
 		private boolean pressed = false;

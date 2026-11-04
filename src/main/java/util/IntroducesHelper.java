@@ -6,34 +6,34 @@ import java.util.Map;
 
 public class IntroducesHelper {
 	int Maxsize = 10;
-	char[] first = new char[Maxsize];   //±äÁ¿1
-	char[] second = new char[Maxsize];  //±äÁ¿2
-	char[] third = new char[Maxsize]; 	//±äÁ¿3
+	char[] first = new char[Maxsize];   //å˜é‡1
+	char[] second = new char[Maxsize];  //å˜é‡2
+	char[] third = new char[Maxsize]; 	//å˜é‡3
 	int next = 0;
 	Map<String,String> _prove = new HashMap<String, String>();
 	
 	IntroducesHelper() {
 	}
 	
-	//µ¥±äÁ¿¹¹Ôìº¯Êı
+	//å•å˜é‡æ„é€ å‡½æ•°
 	IntroducesHelper(char[] first) {
 		this.first = first;
 	}
 	
-	//Ë«±äÁ¿¹¹Ôìº¯Êı
+	//åŒå˜é‡æ„é€ å‡½æ•°
 	public IntroducesHelper(char[] first, char[] second) {
 		this.first = first;
 		this.second = second;
 	}
 	
-	//Èı±äÁ¿¹¹Ôìº¯Êı
+	//ä¸‰å˜é‡æ„é€ å‡½æ•°
 	IntroducesHelper(char[] first, char[] second, char[] third) {
 		this.first = first;
 		this.second = second;
 		this.third = third;
 	}
 	
-	//Î´Éæ¼°±äÁ¿µÄº¯ÊıÊ¹ÓÃ  µ¥Ëã×Óµ¥ÖµµÄ¶¨Àí
+	//æœªæ¶‰åŠå˜é‡çš„å‡½æ•°ä½¿ç”¨  å•ç®—å­å•å€¼çš„å®šç†
 	@SuppressWarnings("unlikely-arg-type")
 	public Boolean Lclass_operate0_1(String operatorType, String element) {
 		_prove.put("/smer", "~xx");
@@ -41,26 +41,26 @@ public class IntroducesHelper {
 		Iterator<String> it = _prove.keySet().iterator();
 		while(it.hasNext()){
 			String key = it.next();
-			System.out.println("keyÖµ£º" + key + " valueÖµ£º" + _prove.get(key));
+			System.out.println("keyå€¼ï¼š" + key + " valueå€¼ï¼š" + _prove.get(key));
 		if(operatorType.equals(key) && element.equals(_prove.get(key))) {
-			System.out.print("ËãÊ½ÕıÈ·-------");
+			System.out.print("ç®—å¼æ­£ç¡®-------");
 			return true;
 		}
 		if(operatorType.equals(key) && ("~" + element).equals(_prove.get(key))) {
-			System.out.print("ËãÊ½´íÎó-------");
+			System.out.print("ç®—å¼é”™è¯¯-------");
 			return false;
 		}
 		}
 		return false;
 	}
 	
-	//Î´Éæ¼°±äÁ¿µÄº¯ÊıÊ¹ÓÃ  ¶àËã×Ó¶àÖµ·µ»Ø½á¹ûµÄ¶¨Àí
+	//æœªæ¶‰åŠå˜é‡çš„å‡½æ•°ä½¿ç”¨  å¤šç®—å­å¤šå€¼è¿”å›ç»“æœçš„å®šç†
 	public String Lclass_operate0_2(String operatorType, String element) {
 		_prove.put("/smer", "~xx");
 		return _prove.put("/esmer", "xx");
 	}
 	
-	//Éæ¼°µ¥±äÁ¿µÄº¯ÊıÊ¹ÓÃ--²éÕÒ
+	//æ¶‰åŠå•å˜é‡çš„å‡½æ•°ä½¿ç”¨--æŸ¥æ‰¾
 	public char Lclass_opreate1(char fir){
 		int j;
 		for(j = 0;j<10;j++) {
@@ -72,7 +72,7 @@ public class IntroducesHelper {
 		return fir;
 	}
 	
-	//Éæ¼°Ë«±äÁ¿µÄº¯ÊıÊ¹ÓÃ--¸³Öµ
+	//æ¶‰åŠåŒå˜é‡çš„å‡½æ•°ä½¿ç”¨--èµ‹å€¼
 	/*public void Lclass_opreate2(char fir, char sec){
 		int j;
 		for(j = 0; j<this.next ;j++) {
@@ -84,7 +84,7 @@ public class IntroducesHelper {
 		}
 	}*/
 	
-	//Éæ¼°Èı±äÁ¿µÄº¯ÊıÊ¹ÓÃ
+	//æ¶‰åŠä¸‰å˜é‡çš„å‡½æ•°ä½¿ç”¨
 	public boolean Lclass_opreate3(char[] first, char[] second, char[] third){
 		return false;
 	}

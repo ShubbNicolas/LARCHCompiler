@@ -1,5 +1,5 @@
 package compiler;
-//±à¼­Ö÷´°¿ÚÌå
+//ç¼–è¾‘ä¸»çª—å£ä½“
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -20,56 +20,56 @@ import util.*;
 public class CompilerFrame extends JFrame{
 
 	private static final long serialVersionUID = 14L;
-	/* ×´Ì¬Ìõ */
+	/* çŠ¶æ€æ¡ */
 	private final static JStatusBar STATUSBAR = new JStatusBar();
-	/* ´°Ìå²Ëµ¥À¸ */
+	/* çª—ä½“èœå•æ  */
 	private final static JMenuBar MENUBAR = new JMenuBar();
-	/* ´°Ìå¹¤¾ßÌõ */
+	/* çª—ä½“å·¥å…·æ¡ */
 	private final static JToolBar TOOLBAR = new JToolBar();
-	/* ÎÄ¼şä¯ÀÀÊ÷ */
+	/* æ–‡ä»¶æµè§ˆæ ‘ */
 	private final static JFileTree FILETREE = new JFileTree(
 			new JFileTree.ExtensionFilter("lnk"));
-	/* Ä¬ÈÏ×ÖÌå */
-	private final static Font LABELFONT = new Font("Ó×Ô²", Font.BOLD, 13);
-	/* ±à¼­Çø×ÖÌå */
+	/* é»˜è®¤å­—ä½“ */
+	private final static Font LABELFONT = new Font("å¹¼åœ†", Font.BOLD, 13);
+	/* ç¼–è¾‘åŒºå­—ä½“ */
 	private Font font = new Font("Courier New", Font.PLAIN, 15);
-	/* ¿ØÖÆÌ¨ºÍ´íÎóÁĞ±í×ÖÌå */
-	private Font conAndErrFont = new Font("Î¢ÈíÑÅºÚ", Font.PLAIN, 14);
-	/* Óï·¨·ÖÎö½á¹ûÏÔÊ¾Çø×ÖÌå */
-	private Font treeFont = new Font("Î¢ÈíÑÅºÚ", Font.PLAIN, 12);
-	/* ÎÄ¼ş²Ëµ¥ */
+	/* æ§åˆ¶å°å’Œé”™è¯¯åˆ—è¡¨å­—ä½“ */
+	private Font conAndErrFont = new Font("å¾®è½¯é›…é»‘", Font.PLAIN, 14);
+	/* è¯­æ³•åˆ†æç»“æœæ˜¾ç¤ºåŒºå­—ä½“ */
+	private Font treeFont = new Font("å¾®è½¯é›…é»‘", Font.PLAIN, 12);
+	/* æ–‡ä»¶èœå• */
 	private static JMenu fileMenu;
-	/* ±à¼­²Ëµ¥ */
+	/* ç¼–è¾‘èœå• */
 	private static JMenu editMenu;
-	/* ÔËĞĞ²Ëµ¥ */
+	/* è¿è¡Œèœå• */
 	private static JMenu runMenu;
-	/* ¸ñÊ½²Ëµ¥ */
+	/* æ ¼å¼èœå• */
 	private static JMenu setMenu;
-	/* ´°¿Ú²Ëµ¥ */
+	/* çª—å£èœå• */
 	private static JMenu windowMenu;
-	/* °ïÖú²Ëµ¥ */
+	/* å¸®åŠ©èœå• */
 	private static JMenu helpMenu;
-	/* ¿ØÖÆÌ¨ºÍ´íÎóĞÅÏ¢ */
+	/* æ§åˆ¶å°å’Œé”™è¯¯ä¿¡æ¯ */
 	public static JTabbedPane proAndConPanel;
-	/* CMM³ÌĞòÎÄ±¾±à¼­Çø */
+	/* CMMç¨‹åºæ–‡æœ¬ç¼–è¾‘åŒº */
 	private static JCloseableTabbedPane editTabbedPane;
 	private static HashMap<JScrollPane, StyleEditor> map = new HashMap<JScrollPane, StyleEditor>();
-	/* ¿ØÖÆÌ¨(ÊäÈëÓëÊä³ö) */
+	/* æ§åˆ¶å°(è¾“å…¥ä¸è¾“å‡º) */
 	public static JTextPane consoleArea = new JTextPane();
-	/* ´íÎóÏÔÊ¾Çø */
+	/* é”™è¯¯æ˜¾ç¤ºåŒº */
 	public static JTextArea problemArea = new JTextArea();
-	/* ±£´æºÍ´ò¿ª¶Ô»°¿ò */
+	/* ä¿å­˜å’Œæ‰“å¼€å¯¹è¯æ¡† */
 	private FileDialog filedialog_save, filedialog_load;
-	/* Undo¹ÜÀíÆ÷ */
+	/* Undoç®¡ç†å™¨ */
 	private final UndoManager undo = new UndoManager();
 	//private UndoableEditListener undoHandler = new UndoHandler();
-	/* ±à¼­ÇøÓÒ¼ü²Ëµ¥ */
+	/* ç¼–è¾‘åŒºå³é”®èœå• */
 	private JPopupMenu popupMenu = new JPopupMenu();
 	private JMenuItem item1;
 	private JMenuItem item2;
 	private JMenuItem item3;
 	private JMenuItem item4;
-	/* ²Ëµ¥×ÓÏî */
+	/* èœå•å­é¡¹ */
 	private JMenuItem newItem;
 	private JMenuItem openItem;
 	private JMenuItem saveItem;
@@ -90,7 +90,7 @@ public class CompilerFrame extends JFrame{
 	private JMenuItem newWindowItem;
 	private JMenuItem helpItem;
 	private JMenuItem aboutItem;
-	/* ¹¤¾ßÌõ°´Å¥ */
+	/* å·¥å…·æ¡æŒ‰é’® */
 	private JButton newButton;
 	private JButton openButton;
 	private JButton saveButton;
@@ -106,10 +106,10 @@ public class CompilerFrame extends JFrame{
 	private JButton fontButton;
 	private JButton helpButton;
 	private JButton aboutButton;
-	/* ÎÄ¼ş¹ıÂËÆ÷ */
+	/* æ–‡ä»¶è¿‡æ»¤å™¨ */
 	FileFilter filter = new FileFilter() {
 		public String getDescription() {
-			return "LARCH³ÌĞòÎÄ¼ş(*.lsl)";
+			return "LARCHç¨‹åºæ–‡ä»¶(*.lsl)";
 		}
 
 		public boolean accept(File file) {
@@ -120,28 +120,28 @@ public class CompilerFrame extends JFrame{
 			return false;
 		}
 	};
-	/* ±£´æÒª²éÕÒµÄ×Ö·û´® */
+	/* ä¿å­˜è¦æŸ¥æ‰¾çš„å­—ç¬¦ä¸² */
 	private static String findStr = null;
-	/* µ±Ç°ÎÄ±¾±à¼­Çø×Ö·û´® */
+	/* å½“å‰æ–‡æœ¬ç¼–è¾‘åŒºå­—ç¬¦ä¸² */
 	private static String text = null;
-	/* µ±Ç°Ñ¡ÔñµÄÎÄ±¾µÄÎ»ÖÃ */
+	/* å½“å‰é€‰æ‹©çš„æ–‡æœ¬çš„ä½ç½® */
 	private static int position;
-	/* ²éÕÒ´ÎÊı */
+	/* æŸ¥æ‰¾æ¬¡æ•° */
 	private static int time = 0;
 	private JTabbedPane tabbedPanel;
-	/* ÓÃ»§ÊäÈë */
+	/* ç”¨æˆ·è¾“å…¥ */
 	private String userInput;
-	/* ¿ØÖÆÌ¨ÁĞÊı */
+	/* æ§åˆ¶å°åˆ—æ•° */
 	private static int columnNum;
-	/* ¿ØÖÆÌ¨ĞĞÊı */
+	/* æ§åˆ¶å°è¡Œæ•° */
 	private static int rowNum;
-	/* ¿ØÖÆÌ¨×î´óĞĞÊı */
+	/* æ§åˆ¶å°æœ€å¤§è¡Œæ•° */
 	private static int presentMaxRow;
 	private static int[] index = new int[] { 0, 0 };
 	private static StyledDocument doc = null;
 
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * 
 	 * @param title
 	 */
@@ -159,15 +159,15 @@ public class CompilerFrame extends JFrame{
 			e.printStackTrace();
 		}
 
-		// ³õÊ¼»¯²Ëµ¥Ïî
-		fileMenu = new JMenu("ÎÄ¼ş(F)");
-		editMenu = new JMenu("±à¼­(E)");
-		runMenu = new JMenu("ÔËĞĞ(R)");
-		setMenu = new JMenu("ÉèÖÃ(S)");
-		windowMenu = new JMenu("´°¿Ú(W)");
-		helpMenu = new JMenu("°ïÖú(H)");
+		// åˆå§‹åŒ–èœå•é¡¹
+		fileMenu = new JMenu("æ–‡ä»¶(F)");
+		editMenu = new JMenu("ç¼–è¾‘(E)");
+		runMenu = new JMenu("è¿è¡Œ(R)");
+		setMenu = new JMenu("è®¾ç½®(S)");
+		windowMenu = new JMenu("çª—å£(W)");
+		helpMenu = new JMenu("å¸®åŠ©(H)");
 
-		// ÉèÖÃ¿ì½İ·½Ê½
+		// è®¾ç½®å¿«æ·æ–¹å¼
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		editMenu.setMnemonic(KeyEvent.VK_E);
 		runMenu.setMnemonic(KeyEvent.VK_R);
@@ -175,7 +175,7 @@ public class CompilerFrame extends JFrame{
 		windowMenu.setMnemonic(KeyEvent.VK_W);
 		helpMenu.setMnemonic(KeyEvent.VK_H);
 
-		// ½«²Ëµ¥Ìí¼Óµ½²Ëµ¥À¸
+		// å°†èœå•æ·»åŠ åˆ°èœå•æ 
 		MENUBAR.add(fileMenu);
 		MENUBAR.add(editMenu);
 		MENUBAR.add(runMenu);
@@ -183,20 +183,20 @@ public class CompilerFrame extends JFrame{
 		MENUBAR.add(windowMenu);
 		MENUBAR.add(helpMenu);
 
-		// ÎªÎÄ¼ş²Ëµ¥Ìí¼Ó×ÓÏî
-		newItem = new JMenuItem("ĞÂ ½¨", new ImageIcon(getClass().getResource(
+		// ä¸ºæ–‡ä»¶èœå•æ·»åŠ å­é¡¹
+		newItem = new JMenuItem("æ–° å»º", new ImageIcon(getClass().getResource(
 				"/images/new.png")));
 		newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 				ActionEvent.CTRL_MASK));
-		openItem = new JMenuItem("´ò ¿ª", new ImageIcon(getClass().getResource(
+		openItem = new JMenuItem("æ‰“ å¼€", new ImageIcon(getClass().getResource(
 				"/images/open.png")));
 		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
 				ActionEvent.CTRL_MASK));
-		saveItem = new JMenuItem("±£ ´æ", new ImageIcon(getClass().getResource(
+		saveItem = new JMenuItem("ä¿ å­˜", new ImageIcon(getClass().getResource(
 				"/images/save.png")));
 		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				ActionEvent.CTRL_MASK));
-		exitItem = new JMenuItem("ÍË ³ö", new ImageIcon(getClass().getResource(
+		exitItem = new JMenuItem("é€€ å‡º", new ImageIcon(getClass().getResource(
 				"/images/exit.png")));
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 				ActionEvent.CTRL_MASK));
@@ -206,36 +206,36 @@ public class CompilerFrame extends JFrame{
 		fileMenu.addSeparator();
 		fileMenu.add(exitItem);
 
-		// Îª±à¼­²Ëµ¥Ìí¼Ó×ÓÏî
-		undoItem = new JMenuItem("³·  Ïú", new ImageIcon(getClass().getResource(
+		// ä¸ºç¼–è¾‘èœå•æ·»åŠ å­é¡¹
+		undoItem = new JMenuItem("æ’¤  é”€", new ImageIcon(getClass().getResource(
 				"/images/undo.png")));
 		undoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 				ActionEvent.CTRL_MASK));
-		redoItem = new JMenuItem("ÖØ  ×ö", new ImageIcon(getClass().getResource(
+		redoItem = new JMenuItem("é‡  åš", new ImageIcon(getClass().getResource(
 				"/images/redo.png")));
 		redoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
 				ActionEvent.CTRL_MASK));
-		copyItem = new JMenuItem("¸´  ÖÆ", new ImageIcon(getClass().getResource(
+		copyItem = new JMenuItem("å¤  åˆ¶", new ImageIcon(getClass().getResource(
 				"/images/copy.png")));
 		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
 				ActionEvent.CTRL_MASK));
-		cutItem = new JMenuItem("¼ô  ÇĞ", new ImageIcon(getClass().getResource(
+		cutItem = new JMenuItem("å‰ª  åˆ‡", new ImageIcon(getClass().getResource(
 				"/images/cut.png")));
 		cutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
 				ActionEvent.CTRL_MASK));
-		pasteItem = new JMenuItem("Õ³  Ìù", new ImageIcon(getClass().getResource(
+		pasteItem = new JMenuItem("ç²˜  è´´", new ImageIcon(getClass().getResource(
 				"/images/paste.png")));
 		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
 				ActionEvent.CTRL_MASK));
-		allItem = new JMenuItem("È«  Ñ¡", new ImageIcon(getClass().getResource(
+		allItem = new JMenuItem("å…¨  é€‰", new ImageIcon(getClass().getResource(
 				"/images/all.png")));
 		allItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
 				ActionEvent.CTRL_MASK));
-		searchItem = new JMenuItem("²é  ÕÒ", new ImageIcon(getClass()
+		searchItem = new JMenuItem("æŸ¥  æ‰¾", new ImageIcon(getClass()
 				.getResource("/images/search.png")));
 		searchItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
 				ActionEvent.CTRL_MASK));
-		deleteItem = new JMenuItem("É¾  ³ı", new ImageIcon(getClass()
+		deleteItem = new JMenuItem("åˆ   é™¤", new ImageIcon(getClass()
 				.getResource("/images/delete.png")));
 		deleteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
 				ActionEvent.CTRL_MASK));
@@ -250,14 +250,14 @@ public class CompilerFrame extends JFrame{
 		editMenu.addSeparator();
 		editMenu.add(searchItem);
 
-		// ÎªÔËĞĞ²Ëµ¥Ìí¼Ó×ÓÏî
-		lexItem = new JMenuItem("´Ê·¨·ÖÎö", new ImageIcon(getClass().getResource(
+		// ä¸ºè¿è¡Œèœå•æ·»åŠ å­é¡¹
+		lexItem = new JMenuItem("è¯æ³•åˆ†æ", new ImageIcon(getClass().getResource(
 				"/images/lex.png")));
 		lexItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
-		parseItem = new JMenuItem("Óï·¨·ÖÎö", new ImageIcon(getClass().getResource(
+		parseItem = new JMenuItem("è¯­æ³•åˆ†æ", new ImageIcon(getClass().getResource(
 				"/images/parse.png")));
 		parseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
-		runItem = new JMenuItem("ÔË    ĞĞ", new ImageIcon(getClass().getResource(
+		runItem = new JMenuItem("è¿    è¡Œ", new ImageIcon(getClass().getResource(
 				"/images/run.png")));
 		runItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		runMenu.add(lexItem);
@@ -265,44 +265,44 @@ public class CompilerFrame extends JFrame{
 		runMenu.addSeparator();
 		runMenu.add(runItem);
 
-		// ÎªÉèÖÃ²Ëµ¥Ìí¼Ó×ÓÏî
-		fontItem = new JMenuItem("×Ö Ìå", new ImageIcon(getClass().getResource(
+		// ä¸ºè®¾ç½®èœå•æ·»åŠ å­é¡¹
+		fontItem = new JMenuItem("å­— ä½“", new ImageIcon(getClass().getResource(
 				"/images/font.png")));
 		fontItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,
 				ActionEvent.CTRL_MASK));
 		setMenu.add(fontItem);
 
-		// Îª´°¿Ú²Ëµ¥Ìí¼Ó×ÓÏî
-		startPageItem = new JMenuItem("¿ªÊ¼Ò³", new ImageIcon(getClass()
+		// ä¸ºçª—å£èœå•æ·»åŠ å­é¡¹
+		startPageItem = new JMenuItem("å¼€å§‹é¡µ", new ImageIcon(getClass()
 				.getResource("/images/startpage.png")));
 		startPageItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 				ActionEvent.ALT_MASK));
-		newWindowItem = new JMenuItem("ĞÂ½¨´°¿Ú", new ImageIcon(getClass()
+		newWindowItem = new JMenuItem("æ–°å»ºçª—å£", new ImageIcon(getClass()
 				.getResource("/images/window.png")));
 		newWindowItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
 				ActionEvent.CTRL_MASK));
 		windowMenu.add(startPageItem);
 		windowMenu.add(newWindowItem);
 
-		// Îª°ïÖú²Ëµ¥Ìí¼Ó×ÓÏî
-		helpItem = new JMenuItem("°ï Öú", new ImageIcon(getClass().getResource(
+		// ä¸ºå¸®åŠ©èœå•æ·»åŠ å­é¡¹
+		helpItem = new JMenuItem("å¸® åŠ©", new ImageIcon(getClass().getResource(
 				"/images/help.png")));
 		helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
-		aboutItem = new JMenuItem("¹Ø ÓÚ", new ImageIcon(getClass().getResource(
+		aboutItem = new JMenuItem("å…³ äº", new ImageIcon(getClass().getResource(
 				"/images/about.png")));
 		aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
 				ActionEvent.CTRL_MASK));
 		helpMenu.add(helpItem);
 		helpMenu.add(aboutItem);
 
-		// ÉèÖÃÓÒ¼ü²Ëµ¥
-		item1 = new JMenuItem("¸´ ÖÆ    ", new ImageIcon(getClass().getResource(
+		// è®¾ç½®å³é”®èœå•
+		item1 = new JMenuItem("å¤ åˆ¶    ", new ImageIcon(getClass().getResource(
 				"/images/copy.png")));
-		item2 = new JMenuItem("¼ô ÇĞ    ", new ImageIcon(getClass().getResource(
+		item2 = new JMenuItem("å‰ª åˆ‡    ", new ImageIcon(getClass().getResource(
 				"/images/cut.png")));
-		item3 = new JMenuItem("Õ³ Ìù    ", new ImageIcon(getClass().getResource(
+		item3 = new JMenuItem("ç²˜ è´´    ", new ImageIcon(getClass().getResource(
 				"/images/paste.png")));
-		item4 = new JMenuItem("È« Ñ¡    ", new ImageIcon(getClass().getResource(
+		item4 = new JMenuItem("å…¨ é€‰    ", new ImageIcon(getClass().getResource(
 				"/images/all.png")));
 		popupMenu.add(item1);
 		popupMenu.add(item2);
@@ -310,52 +310,52 @@ public class CompilerFrame extends JFrame{
 		popupMenu.addSeparator();
 		popupMenu.add(item4);
 
-		// ¹¤¾ßÌõ
+		// å·¥å…·æ¡
 		newButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/new.png")));
-		newButton.setToolTipText("ĞÂ½¨");
+		newButton.setToolTipText("æ–°å»º");
 		openButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/open.png")));
-		openButton.setToolTipText("´ò¿ª");
+		openButton.setToolTipText("æ‰“å¼€");
 		saveButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/save.png")));
-		saveButton.setToolTipText("±£´æ");
+		saveButton.setToolTipText("ä¿å­˜");
 		lexButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/lex.png")));
-		lexButton.setToolTipText("´Ê·¨·ÖÎö");
+		lexButton.setToolTipText("è¯æ³•åˆ†æ");
 		parseButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/parse.png")));
-		parseButton.setToolTipText("Óï·¨·ÖÎö");
+		parseButton.setToolTipText("è¯­æ³•åˆ†æ");
 		runButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/run.png")));
-		runButton.setToolTipText("ÔËĞĞ");
+		runButton.setToolTipText("è¿è¡Œ");
 		undoButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/undo.png")));
-		undoButton.setToolTipText("³·Ïú");
+		undoButton.setToolTipText("æ’¤é”€");
 		redoButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/redo.png")));
-		redoButton.setToolTipText("ÖØ×ö");
+		redoButton.setToolTipText("é‡åš");
 		copyButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/copy.png")));
-		copyButton.setToolTipText("¸´ÖÆ");
+		copyButton.setToolTipText("å¤åˆ¶");
 		cutButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/cut.png")));
-		cutButton.setToolTipText("¼ôÇĞ");
+		cutButton.setToolTipText("å‰ªåˆ‡");
 		pasteButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/paste.png")));
-		pasteButton.setToolTipText("Õ³Ìù");
+		pasteButton.setToolTipText("ç²˜è´´");
 		searchButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/search.png")));
-		searchButton.setToolTipText("²éÕÒ");
+		searchButton.setToolTipText("æŸ¥æ‰¾");
 		fontButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/font.png")));
-		fontButton.setToolTipText("×ÖÌåÉèÖÃ");
+		fontButton.setToolTipText("å­—ä½“è®¾ç½®");
 		helpButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/help.png")));
-		helpButton.setToolTipText("°ïÖú");
+		helpButton.setToolTipText("å¸®åŠ©");
 		aboutButton = new JButton(new ImageIcon(getClass().getResource(
 				"/images/about.png")));
-		aboutButton.setToolTipText("¹ØÓÚ");
+		aboutButton.setToolTipText("å…³äº");
 		TOOLBAR.setFloatable(false);
 		TOOLBAR.add(newButton);
 		TOOLBAR.add(openButton);
@@ -387,10 +387,10 @@ public class CompilerFrame extends JFrame{
 		add(TOOLBAR);
 		TOOLBAR.setBounds(0, 0, 1240, 33);
 		TOOLBAR.setPreferredSize(getPreferredSize());
-		// ÎÄ¼ş±£´æºÍ´ò¿ª¶Ô»°¿ò
-				filedialog_save = new FileDialog(this, "±£´æÎÄ¼ş", FileDialog.SAVE);
+		// æ–‡ä»¶ä¿å­˜å’Œæ‰“å¼€å¯¹è¯æ¡†
+				filedialog_save = new FileDialog(this, "ä¿å­˜æ–‡ä»¶", FileDialog.SAVE);
 				filedialog_save.setVisible(false);
-				filedialog_load = new FileDialog(this, "´ò¿ªÎÄ¼ş", FileDialog.LOAD);
+				filedialog_load = new FileDialog(this, "æ‰“å¼€æ–‡ä»¶", FileDialog.LOAD);
 				filedialog_load.setVisible(false);
 				filedialog_save.addWindowListener(new WindowAdapter() {
 					public void windowClosing(WindowEvent e) {
@@ -403,12 +403,12 @@ public class CompilerFrame extends JFrame{
 					}
 				});
 
-				// ×ÊÔ´¹ÜÀíÇø(ÎÄ¼şÄ¿Â¼ä¯ÀÀÇø)
+				// èµ„æºç®¡ç†åŒº(æ–‡ä»¶ç›®å½•æµè§ˆåŒº)
 				JPanel fileScanPanel = new JPanel(new BorderLayout());
-				JLabel fileLabel = new JLabel("×ÊÔ´¹ÜÀíÆ÷");
+				JLabel fileLabel = new JLabel("èµ„æºç®¡ç†å™¨");
 				JPanel fileLabelPanel = new JPanel(new BorderLayout());
-				JTextArea introductionArea = new JTextArea("\nLARCH±àÒëÆ÷£º\n");
-				introductionArea.setFont(new Font("Ó×Ô²", Font.BOLD, 14));
+				JTextArea introductionArea = new JTextArea("\nLARCHç¼–è¯‘å™¨ï¼š\n");
+				introductionArea.setFont(new Font("å¹¼åœ†", Font.BOLD, 14));
 				introductionArea.setBackground(getBackground());
 				introductionArea.setEditable(false);
 				fileLabel.setFont(LABELFONT);
@@ -421,7 +421,7 @@ public class CompilerFrame extends JFrame{
 				fileScanPanel.setBounds(0, TOOLBAR.getHeight(), 195, 768
 						- TOOLBAR.getHeight() - STATUSBAR.getHeight() - 98);
 
-				// LARCHÎÄ±¾±à¼­Çø
+				// LARCHæ–‡æœ¬ç¼–è¾‘åŒº
 				editTabbedPane = new JCloseableTabbedPane();
 				editTabbedPane.setFont(treeFont);
 
@@ -434,11 +434,11 @@ public class CompilerFrame extends JFrame{
 				editor.addMouseListener(new DefaultMouseAdapter());
 				editor.addCaretListener(new StatusListener());
 				//editor.getDocument().addUndoableEditListener(undoHandler);
-				// »ñµÃÄ¬ÈÏ½¹µã
+				// è·å¾—é»˜è®¤ç„¦ç‚¹
 				addWindowListener(new WindowAdapter() {
 					public void windowOpened(WindowEvent evt) {
 						editor.requestFocus();
-						STATUSBAR.setStatus(0, "µ±Ç°ĞĞºÅ: " + 1 + ", µ±Ç°ÁĞºÅ: " + 1);
+						STATUSBAR.setStatus(0, "å½“å‰è¡Œå·: " + 1 + ", å½“å‰åˆ—å·: " + 1);
 					}
 				});
 				map.put(scrollPane, editor);
@@ -446,13 +446,13 @@ public class CompilerFrame extends JFrame{
 				JPanel editPanel = new JPanel(null);
 				editPanel.setBackground(getBackground());
 				editPanel.setForeground(new Color(238, 238, 238));
-				JLabel editLabel = new JLabel("|LARCH³ÌĞòÎÄ±¾±à¼­Çø");
+				JLabel editLabel = new JLabel("|LARCHç¨‹åºæ–‡æœ¬ç¼–è¾‘åŒº");
 				JPanel editLabelPanel = new JPanel(new BorderLayout());
 				editLabel.setFont(LABELFONT);
 				editLabelPanel.add(editLabel, BorderLayout.WEST);
 				editLabelPanel.setBackground(Color.LIGHT_GRAY);
 
-				// ¿ØÖÆÌõºÍ´íÎóÁĞ±íÇø
+				// æ§åˆ¶æ¡å’Œé”™è¯¯åˆ—è¡¨åŒº
 				consoleArea.setEditable(false);
 				problemArea.setRows(6);
 				problemArea.setEditable(false);
@@ -460,8 +460,8 @@ public class CompilerFrame extends JFrame{
 				problemArea.setFont(conAndErrFont);
 				proAndConPanel = new JTabbedPane();
 				proAndConPanel.setFont(treeFont);
-				proAndConPanel.add(new JScrollPane(consoleArea), "¿ØÖÆÌ¨");
-				//proAndConPanel.add(new JScrollPane(problemArea), "´íÎóÁĞ±í");
+				proAndConPanel.add(new JScrollPane(consoleArea), "æ§åˆ¶å°");
+				//proAndConPanel.add(new JScrollPane(problemArea), "é”™è¯¯åˆ—è¡¨");
 
 				editPanel.add(editLabelPanel);
 				editPanel.add(editTabbedPane);
@@ -473,16 +473,16 @@ public class CompilerFrame extends JFrame{
 				editPanel.setBounds(fileScanPanel.getWidth(), TOOLBAR.getHeight(), 815,
 						768 - TOOLBAR.getHeight() - STATUSBAR.getHeight() - 98);
 
-				// ´Ê·¨·ÖÎö½á¹ûÏÔÊ¾Çø
+				// è¯æ³•åˆ†æç»“æœæ˜¾ç¤ºåŒº
 				JScrollPane lexerPanel = new JScrollPane(null);
 				JScrollPane parserPanel = new JScrollPane(null);
 				tabbedPanel = new JTabbedPane(JTabbedPane.TOP,
 						JTabbedPane.SCROLL_TAB_LAYOUT);
 				tabbedPanel.setFont(treeFont);
-				tabbedPanel.add(lexerPanel, "´Ê·¨·ÖÎö");
-				tabbedPanel.add(parserPanel, "Óï·¨·ÖÎö");
+				tabbedPanel.add(lexerPanel, "è¯æ³•åˆ†æ");
+				tabbedPanel.add(parserPanel, "è¯­æ³•åˆ†æ");
 				JPanel resultPanel = new JPanel(new BorderLayout());
-				JLabel resultLabel = new JLabel("|·ÖÎö½á¹ûÏÔÊ¾Çø");
+				JLabel resultLabel = new JLabel("|åˆ†æç»“æœæ˜¾ç¤ºåŒº");
 				JPanel resultLabelPanel = new JPanel(new BorderLayout());
 				resultLabel.setFont(LABELFONT);
 				resultLabelPanel.add(resultLabel, BorderLayout.WEST);
@@ -494,12 +494,12 @@ public class CompilerFrame extends JFrame{
 						TOOLBAR.getHeight(), 1200 - fileScanPanel.getWidth()
 								- editPanel.getWidth() + 38, 768 - TOOLBAR.getHeight()
 								- STATUSBAR.getHeight() - 98);
-				// ÉèÖÃ×´Ì¬Ìõ
+				// è®¾ç½®çŠ¶æ€æ¡
 				STATUSBAR.addStatusCell(6666);
 				add(STATUSBAR);
 				STATUSBAR.setBounds(0, TOOLBAR.getHeight() + editPanel.getHeight(),
 						1240, 20);
-				// ÎªFILETREEÌí¼ÓË«»÷¼àÌıÆ÷£¬Ê¹ÆäÔÚË«»÷Ò»¸öÎÄ¼şÊ±´ò¿ª¸ÃÎÄ¼ş
+				// ä¸ºFILETREEæ·»åŠ åŒå‡»ç›‘å¬å™¨ï¼Œä½¿å…¶åœ¨åŒå‡»ä¸€ä¸ªæ–‡ä»¶æ—¶æ‰“å¼€è¯¥æ–‡ä»¶
 				FILETREE.setFont(treeFont);
 				FILETREE.addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
@@ -537,9 +537,9 @@ public class CompilerFrame extends JFrame{
 				});
 				doc = consoleArea.getStyledDocument();
 				consoleArea.addKeyListener(new KeyAdapter() {
-					// °´ÏÂÄ³¼ü
+					// æŒ‰ä¸‹æŸé”®
 					public void keyPressed(KeyEvent e) {
-						// »ñµÃµ±Ç°µÄĞĞºÍÁĞÎ»ÖÃ
+						// è·å¾—å½“å‰çš„è¡Œå’Œåˆ—ä½ç½®
 						getCurrenRowAndCol();
 						if (rowNum > presentMaxRow) {
 							presentMaxRow = rowNum;
@@ -558,15 +558,15 @@ public class CompilerFrame extends JFrame{
 						}
 					}
 				
-				// ÊÍ·ÅÄ³¼ü
+				// é‡Šæ”¾æŸé”®
 				public void keyReleased(KeyEvent e) {
-					// »ñµÃµ±Ç°µÄĞĞºÍÁĞÎ»ÖÃ
+					// è·å¾—å½“å‰çš„è¡Œå’Œåˆ—ä½ç½®
 					getCurrenRowAndCol();
 					if (rowNum > presentMaxRow) {
 						presentMaxRow = rowNum;
 					}
 					if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-						// »ñµÃ¹â±êÏà¶Ô0ĞĞ0ÁĞµÄÎ»ÖÃ
+						// è·å¾—å…‰æ ‡ç›¸å¯¹0è¡Œ0åˆ—çš„ä½ç½®
 						int pos = consoleArea.getCaretPosition();
 						index[0] = index[1];
 						index[1] = pos;
@@ -586,7 +586,7 @@ public class CompilerFrame extends JFrame{
 					}
 				}
 			});
-				// Îª²Ëµ¥ÏîÌí¼ÓÊÂ¼ş¼àÌıÆ÷
+				// ä¸ºèœå•é¡¹æ·»åŠ äº‹ä»¶ç›‘å¬å™¨
 				newItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent paramActionEvent) {
 						create(null);
@@ -670,9 +670,9 @@ public class CompilerFrame extends JFrame{
 				helpItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						JOptionPane.showMessageDialog(new JOptionPane(),
-								"ÕâÊÇÒ»¸ö¼òµ¥µÄLARCHÓïÑÔ±àÒëÆ÷£¬¿ÉÒÔ¶ÔLARCH\n³ÌĞòÎÄ¼ş½øĞĞ±à¼­¡¢"
-										+ "´Ê·¨·ÖÎö¡¢Óï·¨·ÖÎö£¬²¢¿ÉÒÔ\n½øĞĞ±àÒë¡¢ÔËĞĞºÍÊä³ö³ÌĞò½á¹û£¬ "
-										+ "Í¬Ê±»¹ÊµÏÖÁË\n¶Ô³ÌĞò½øĞĞ³ö´í¼ì²éµÄ¹¦ÄÜ.", "°ïÖú",
+								"è¿™æ˜¯ä¸€ä¸ªç®€å•çš„LARCHè¯­è¨€ç¼–è¯‘å™¨ï¼Œå¯ä»¥å¯¹LARCH\nç¨‹åºæ–‡ä»¶è¿›è¡Œç¼–è¾‘ã€"
+										+ "è¯æ³•åˆ†æã€è¯­æ³•åˆ†æï¼Œå¹¶å¯ä»¥\nè¿›è¡Œç¼–è¯‘ã€è¿è¡Œå’Œè¾“å‡ºç¨‹åºç»“æœï¼Œ "
+										+ "åŒæ—¶è¿˜å®ç°äº†\nå¯¹ç¨‹åºè¿›è¡Œå‡ºé”™æ£€æŸ¥çš„åŠŸèƒ½.", "å¸®åŠ©",
 								JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
@@ -682,7 +682,7 @@ public class CompilerFrame extends JFrame{
 								 JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
-				// ÎªÓÒ¼ü²Ëµ¥Ìí¼ÓÊÂ¼ş¼àÌıÆ÷
+				// ä¸ºå³é”®èœå•æ·»åŠ äº‹ä»¶ç›‘å¬å™¨
 				item1.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						copy();
@@ -704,7 +704,7 @@ public class CompilerFrame extends JFrame{
 					}
 				});
 
-				// Îª¹¤¾ßÌõ°´Å¥Ìí¼ÓÊÂ¼ş¼àÌıÆ÷
+				// ä¸ºå·¥å…·æ¡æŒ‰é’®æ·»åŠ äº‹ä»¶ç›‘å¬å™¨
 				newButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent paramActionEvent) {
 						create(null);
@@ -729,12 +729,12 @@ public class CompilerFrame extends JFrame{
 					public void actionPerformed(ActionEvent arg0) {
 						lex();
 					}
-				});//´Ê·¨·ÖÎö
+				});//è¯æ³•åˆ†æ
 				parseButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						parse();
 					}
-				});*///Óï·¨·ÖÎö
+				});*///è¯­æ³•åˆ†æ
 				undoButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						undo();
@@ -773,9 +773,9 @@ public class CompilerFrame extends JFrame{
 				helpButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						JOptionPane.showMessageDialog(new JOptionPane(),
-								"ÕâÊÇÒ»¸ö¼òµ¥µÄLARCHÓïÑÔ±àÒëÆ÷£¬¿ÉÒÔ¶ÔLARCH\n³ÌĞòÎÄ¼ş½øĞĞ±à¼­¡¢"
-										+ "´Ê·¨·ÖÎö¡¢Óï·¨·ÖÎö£¬²¢¿ÉÒÔ\n½øĞĞ±àÒë¡¢ÔËĞĞºÍÊä³ö³ÌĞò½á¹û£¬ "
-										+ "Í¬Ê±»¹ÊµÏÖÁË\n¶Ô³ÌĞò½øĞĞ³ö´í¼ì²éµÄ¹¦ÄÜ.", "°ïÖú",
+								"è¿™æ˜¯ä¸€ä¸ªç®€å•çš„LARCHè¯­è¨€ç¼–è¯‘å™¨ï¼Œå¯ä»¥å¯¹LARCH\nç¨‹åºæ–‡ä»¶è¿›è¡Œç¼–è¾‘ã€"
+										+ "è¯æ³•åˆ†æã€è¯­æ³•åˆ†æï¼Œå¹¶å¯ä»¥\nè¿›è¡Œç¼–è¯‘ã€è¿è¡Œå’Œè¾“å‡ºç¨‹åºç»“æœï¼Œ "
+										+ "åŒæ—¶è¿˜å®ç°äº†\nå¯¹ç¨‹åºè¿›è¡Œå‡ºé”™æ£€æŸ¥çš„åŠŸèƒ½.", "å¸®åŠ©",
 								JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
@@ -786,7 +786,7 @@ public class CompilerFrame extends JFrame{
 					}
 				});
 			}
-//ÄÚ²¿Àà£º¼àÌıÊó±êÓÒ¼ü
+//å†…éƒ¨ç±»ï¼šç›‘å¬é¼ æ ‡å³é”®
 	class DefaultMouseAdapter extends MouseAdapter {
 		public void mouseReleased(MouseEvent e) {
 			if (SwingUtilities.isRightMouseButton(e)) {
@@ -795,21 +795,21 @@ public class CompilerFrame extends JFrame{
 		}
 	}
 
-	// ÄÚ²¿Àà£ºUndo¹ÜÀí
+	// å†…éƒ¨ç±»ï¼šUndoç®¡ç†
 	class UndoHandler implements UndoableEditListener {
 		public void undoableEditHappened(UndoableEditEvent e) {
 			undo.addEdit(e.getEdit());
 		}
 	}
 
-	// ÄÚ²¿Àà£º¿ØÖÆ×´Ì¬ÌõµÄÏÔÊ¾
+	// å†…éƒ¨ç±»ï¼šæ§åˆ¶çŠ¶æ€æ¡çš„æ˜¾ç¤º
 	class StatusListener implements CaretListener {
 		public void caretUpdate(CaretEvent e) {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			try {
 				int row = temp.getLineOfOffset(e.getDot());
 				int column = e.getDot() - temp.getLineStartOffset(row);
-				STATUSBAR.setStatus(0, "µ±Ç°ĞĞºÅ: " + (row + 1) + ", µ±Ç°ÁĞºÅ: "
+				STATUSBAR.setStatus(0, "å½“å‰è¡Œå·: " + (row + 1) + ", å½“å‰åˆ—å·: "
 						+ (column + 1));
 			} catch (Exception e2) {
 				e2.printStackTrace();
@@ -817,7 +817,7 @@ public class CompilerFrame extends JFrame{
 		}
 	}
 	
-	// ÔËĞĞ£º·ÖÎö²¢ÔËĞĞLARCH³ÌĞò£¬ÏÔÊ¾ÔËĞĞ½á¹û
+	// è¿è¡Œï¼šåˆ†æå¹¶è¿è¡ŒLARCHç¨‹åºï¼Œæ˜¾ç¤ºè¿è¡Œç»“æœ
 		public void run() {
 			consoleArea.setText(null);
 			columnNum = 0;
@@ -826,12 +826,12 @@ public class CompilerFrame extends JFrame{
 			index = new int[] { 0, 0 };
 		}
 
-		// ĞÂ½¨
+		// æ–°å»º
 		private void create(String filename) {
 			if (filename == null) {
-				filename = JOptionPane.showInputDialog("ÇëÊäÈëĞÂ½¨ÎÄ¼şµÄÃû×Ö.(ºó×ºÃûÎª.lsl)");
+				filename = JOptionPane.showInputDialog("è¯·è¾“å…¥æ–°å»ºæ–‡ä»¶çš„åå­—.(åç¼€åä¸º.lsl)");
 				if (filename == null || filename.equals("")) {
-					JOptionPane.showMessageDialog(null, "ÎÄ¼şÃû²»ÄÜÎª¿Õ!");
+					JOptionPane.showMessageDialog(null, "æ–‡ä»¶åä¸èƒ½ä¸ºç©º!");
 					return;
 				}
 			}
@@ -849,7 +849,7 @@ public class CompilerFrame extends JFrame{
 			editTabbedPane.setSelectedIndex(editTabbedPane.getTabCount() - 1);
 		}
 
-		// ´ò¿ª
+		// æ‰“å¼€
 		private void open() {
 			boolean isOpened = false;
 			String str = "", fileName = "";
@@ -886,7 +886,7 @@ public class CompilerFrame extends JFrame{
 			}
 		}
 
-		// ±£´æ
+		// ä¿å­˜
 		private void save() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			if (temp.getText() != null) {
@@ -905,7 +905,7 @@ public class CompilerFrame extends JFrame{
 			}
 		}
 
-		// ³·Ïú
+		// æ’¤é”€
 		private void undo() {
 			if (undo.canUndo()) {
 				try {
@@ -916,7 +916,7 @@ public class CompilerFrame extends JFrame{
 			}
 		}
 
-		// ÖØ×ö
+		// é‡åš
 		private void redo() {
 			if (undo.canRedo()) {
 				try {
@@ -927,35 +927,35 @@ public class CompilerFrame extends JFrame{
 			}
 		}
 
-		// ¸´ÖÆ
+		// å¤åˆ¶
 		private void copy() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			temp.copy();
 		}
 
-		// ¼ôÇĞ
+		// å‰ªåˆ‡
 		private void cut() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			temp.cut();
 		}
 
-		// Õ³Ìù
+		// ç²˜è´´
 		private void paste() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			temp.paste();
 		}
 
-		// ²éÕÒ
+		// æŸ¥æ‰¾
 		private void search() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			if (text == null)
 				text = temp.getText();
 			if (findStr == null)
-				findStr = JOptionPane.showInputDialog(this, "ÇëÊäÈëÒªÕÒµÄ×Ö·û´®!");
+				findStr = JOptionPane.showInputDialog(this, "è¯·è¾“å…¥è¦æ‰¾çš„å­—ç¬¦ä¸²!");
 			if (findStr != null) {
 				position = text.indexOf(findStr);
 				if (text.equals("")) {
-					JOptionPane.showMessageDialog(this, "Ã»ÓĞÄãÒª²éÕÒµÄ×Ö·û´®£¡");
+					JOptionPane.showMessageDialog(this, "æ²¡æœ‰ä½ è¦æŸ¥æ‰¾çš„å­—ç¬¦ä¸²ï¼");
 					findStr = null;
 				} else {
 					if (position != -1) {
@@ -966,7 +966,7 @@ public class CompilerFrame extends JFrame{
 								+ findStr.length()));
 						time += 1;
 					} else {
-						JOptionPane.showMessageDialog(this, "Ã»ÓĞÄãÒª²éÕÒµÄ×Ö·û´®£¡");
+						JOptionPane.showMessageDialog(this, "æ²¡æœ‰ä½ è¦æŸ¥æ‰¾çš„å­—ç¬¦ä¸²ï¼");
 						time = 0;
 						text = null;
 						findStr = null;
@@ -975,33 +975,33 @@ public class CompilerFrame extends JFrame{
 			}
 		}
 
-		// È«Ñ¡
+		// å…¨é€‰
 		private void selectAll() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			temp.selectAll();
 		}
 
-		// É¾³ı
+		// åˆ é™¤
 		private void delete() {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
 			temp.replaceSelection("");
 		}
-		// ÉèÖÃ×ÖÌå
+		// è®¾ç½®å­—ä½“
 		private void setFont() {
 			font = JFontDialog
-					.showDialog(getContentPane(), "×ÖÌåÉèÖÃ", true, getFont());
+					.showDialog(getContentPane(), "å­—ä½“è®¾ç½®", true, getFont());
 			for (int i = 0; i < editTabbedPane.getComponentCount(); i++)
 				map.get(editTabbedPane.getComponent(i)).setFont(font);
 		}
 		private void getCurrenRowAndCol() {
 			int row = 0;
 			int col = 0;
-			// »ñµÃ¹â±êÏà¶Ô0ĞĞ0ÁĞµÄÎ»ÖÃ
+			// è·å¾—å…‰æ ‡ç›¸å¯¹0è¡Œ0åˆ—çš„ä½ç½®
 			int pos = consoleArea.getCaretPosition();
 			Element root = consoleArea.getDocument().getDefaultRootElement();
 			int index = root.getElementIndex(doc.getParagraphElement(pos)
 					.getStartOffset());
-			// ÁĞ!!!
+			// åˆ—!!!
 			try {
 				col = pos
 						- doc.getText(0, doc.getLength()).substring(0, pos)
@@ -1009,9 +1009,9 @@ public class CompilerFrame extends JFrame{
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			}
-			// ĞĞ!!!
+			// è¡Œ!!!
 			try {
-				// ·µ»ØĞĞÊÇ´Ó0ËãÆğµÄ,ËùÒÔ+1
+				// è¿”å›è¡Œæ˜¯ä»0ç®—èµ·çš„,æ‰€ä»¥+1
 				row = Integer.parseInt(String.valueOf(index + 1));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1022,17 +1022,17 @@ public class CompilerFrame extends JFrame{
 					doc.getLength()).getStartOffset()) + 1;
 		}
 
-		// ¸Ä±äcontrolAreaµÄÑÕÉ«Óë±à¼­ÊôĞÔ
+		// æ”¹å˜controlAreaçš„é¢œè‰²ä¸ç¼–è¾‘å±æ€§
 		public static void setControlArea(Color c, boolean edit) {
 			proAndConPanel.setSelectedIndex(0);
 			consoleArea.setFocusable(true);
 			consoleArea.setForeground(c);
 			consoleArea.setEditable(edit);
 		}
-		// Ö÷º¯Êı
+		// ä¸»å‡½æ•°
 	public static void main(String[] args) {
 		System.out.println("111111");
-		CompilerFrame frame = new CompilerFrame("LARCH½âÊÍÆ÷");
+		CompilerFrame frame = new CompilerFrame("LARCHè§£é‡Šå™¨");
 		System.out.println("111111");
 		frame.setBounds(60, 0, 1240, 742);
 		frame.setResizable(false);

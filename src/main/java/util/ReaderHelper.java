@@ -13,27 +13,27 @@ public class ReaderHelper {
     public String Traitname;
     public String []assertContent;
     
-    //TraitµÄÃû×Ö
+    //Traitçš„åå­—
     public static int linecount=0;
     public int totalline=0;
-    //ÓÃÀ´¼ÆËã×Ü¹²ÓĞ¶àÉÙĞĞ
+    //ç”¨æ¥è®¡ç®—æ€»å…±æœ‰å¤šå°‘è¡Œ
     public String [] getline;
-	//°´ĞĞ´æÈ¡txtÎÄ¼şÖĞµÄ´úÂë
+	//æŒ‰è¡Œå­˜å–txtæ–‡ä»¶ä¸­çš„ä»£ç 
 	public Stack<String> newStack =new Stack<String>();
-	//´æ·Å¹Ø¼ü×ÖnewµÄÏà¹Ø²ÎÊıÀàĞÍ
+	//å­˜æ”¾å…³é”®å­—newçš„ç›¸å…³å‚æ•°ç±»å‹
 	public Stack<String> addStack = new Stack<String>();	
-	//ÓÃÀ´´æ·Åaddº¯ÊıµÄÏà¹Ø²ÎÊıÀàĞÍ
+	//ç”¨æ¥å­˜æ”¾addå‡½æ•°çš„ç›¸å…³å‚æ•°ç±»å‹
 	public Stack<String> lookupStack = new Stack<String>();
-	//ÓÃÀ´´æ·Ålookupº¯ÊıµÄÏà¹Ø²ÎÊıÀàĞÍ
+	//ç”¨æ¥å­˜æ”¾lookupå‡½æ•°çš„ç›¸å…³å‚æ•°ç±»å‹
 	public Stack<String> belongStack = new Stack<String>();
-	//ÓÃÀ´´æ·Åbelongstackº¯ÊıµÄÏà¹Ø²ÎÊıÀàĞÍ
+	//ç”¨æ¥å­˜æ”¾belongstackå‡½æ•°çš„ç›¸å…³å‚æ•°ç±»å‹
 
-    //Í¨¹ı´ò¿ªÎÄ¼ş¶Ô»°¿ò»ñÈ¡ÎÄ¼şÂ·¾¶
+    //é€šè¿‡æ‰“å¼€æ–‡ä»¶å¯¹è¯æ¡†è·å–æ–‡ä»¶è·¯å¾„
 	public void setPath(String path)
 	{
 		this.path=path;
 	}
-	//Éè¼Æº¯Êı£¬ÓÃÀ´É¨ÃètxtÎÄ¼ş¶ÁÈ¡larchÓï¾ä²¢·ÖÅäµ½Ïà¹ØÎ»ÖÃ
+	//è®¾è®¡å‡½æ•°ï¼Œç”¨æ¥æ‰«ætxtæ–‡ä»¶è¯»å–larchè¯­å¥å¹¶åˆ†é…åˆ°ç›¸å…³ä½ç½®
 	public void Assign()
 	{
 		
@@ -43,7 +43,7 @@ public class ReaderHelper {
 			int a=0;
 			   while(linecount>0)
 		        {	
-			          /*System.out.println(getline[a].replace("¡ú", ","));
+			          /*System.out.println(getline[a].replace("â†’", ","));
 				   
 				      /String[] strs=temp.split(":");
 					  for(String s : strs)
@@ -52,7 +52,7 @@ public class ReaderHelper {
 					}*/  
 				  if (getline[a].indexOf("trait")!=-1)
 				  {
-					  String temp= getline[a].replace("¡ú", ",");
+					  String temp= getline[a].replace("â†’", ",");
 					
 					  String[] strs=temp.split(" ");
 					  Traitname=strs[0];
@@ -60,14 +60,14 @@ public class ReaderHelper {
 				  
 				  else if(getline[a].indexOf("new")!=-1)
 				  {
-					  String temp= getline[a].replace("¡ú", ",");
+					  String temp= getline[a].replace("â†’", ",");
 					  String temp2= deleteBlank(temp);
 					  String[] strs=temp2.split(" |:|,");
 					  newStack.push(strs[1]);
 				  }
 				  else if(getline[a].indexOf("add")!=-1)
 				  {
-					  String temp= getline[a].replace("¡ú", ",");
+					  String temp= getline[a].replace("â†’", ",");
 					 String temp2= deleteBlank(temp);
 					  String[] strs=temp2.split(" |:|,");  
 					//for(String s : strs)
@@ -91,7 +91,7 @@ public class ReaderHelper {
 				  }
 				  else if(getline[a].indexOf("/belong")!=-1)
 				  {
-					  String temp= getline[a].replace("¡ú", ",");
+					  String temp= getline[a].replace("â†’", ",");
 					  String temp2= deleteBlank(temp);
 					  String[] strs=temp2.split(" |:|,");
 					  belongStack.push(strs[1]);
@@ -101,7 +101,7 @@ public class ReaderHelper {
 				  }
 				  else if(getline[a].indexOf("lookup")!=-1)
 				  {
-					  String temp= getline[a].replace("¡ú", ",");
+					  String temp= getline[a].replace("â†’", ",");
 					  String temp2= deleteBlank(temp);
 					  String[] strs=temp2.split(" |:|,");
 					  lookupStack.push(strs[1]);
@@ -111,7 +111,7 @@ public class ReaderHelper {
 				  }
 				  else if(getline[a].indexOf("asserts")!=-1)
 				  {
-					 //String temp= getline[a].replace("¡ú", ",");
+					 //String temp= getline[a].replace("â†’", ",");
 					 assertContent=new String[linecount];
 					  int n=0;
 					  while(linecount>0)
@@ -133,14 +133,14 @@ public class ReaderHelper {
 			e.printStackTrace();}
 	}
 	/**
-	 * °´ĞĞ¶ÁÈ¡ÎÄ¼ş´æÔÚ×Ö·û´®Êı×é²¢·µ»Ø
+	 * æŒ‰è¡Œè¯»å–æ–‡ä»¶å­˜åœ¨å­—ç¬¦ä¸²æ•°ç»„å¹¶è¿”å›
 	 * @param path
 	 * @return
 	 * @throws IOException
 	 */
 	
 	public static String[] readFile(String path) throws IOException {
-        // ÓÃ×Ö·û´®´æÂ·¾¶
+        // ç”¨å­—ç¬¦ä¸²å­˜è·¯å¾„
         String[]txtline = new String[15];
       
         FileInputStream fis = new FileInputStream(path);
@@ -162,7 +162,7 @@ public class ReaderHelper {
     }
 	
     /**
-     * --É¾³ı³ÌĞòĞĞÖĞÖ¸¶¨µÄ×Ó´®
+     * --åˆ é™¤ç¨‹åºè¡Œä¸­æŒ‡å®šçš„å­ä¸²
      * @param str1 str2
      * @return
      */
@@ -200,7 +200,7 @@ public class ReaderHelper {
 	}
     
     /**
-     * --É¾³ı³ÌĞòĞĞÖĞµÄ¿Õ¸ñ
+     * --åˆ é™¤ç¨‹åºè¡Œä¸­çš„ç©ºæ ¼
      * @param str1
      * @return
      */

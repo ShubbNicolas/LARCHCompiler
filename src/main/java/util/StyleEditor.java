@@ -25,7 +25,7 @@ import javax.swing.text.TabStop;
 public class StyleEditor extends JTextPane implements DocumentListener {
 
 	private static final long serialVersionUID = 1L;
-	// 表明是否启用解释器来解析数据,默认使用
+	// 琛ㄦ槑鏄惁鍚敤瑙ｉ噴鍣ㄦ潵瑙ｆ瀽鏁版嵁,榛樿浣跨敤
 	private boolean cmmCompiler = true;
 
 	private int caretStartPosiont = 0;
