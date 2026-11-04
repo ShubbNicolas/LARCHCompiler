@@ -33,6 +33,6 @@ PQueue(E, Q): trait
       if isEmpty(q) ∨ e ≤ head(q) then q else insert(e, tail(q))
   implies
     q: Q, e: E
-    e ∈ q ⇒ e ≤ head(q);
+    e ∈ q ⇒ e ≥ head(q);
   converts head, tail, isEmpty, count
   exempting head(empty), tail(empty)

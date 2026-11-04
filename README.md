@@ -129,7 +129,7 @@ LSL 是声明式规格，没有执行语义。「运行」的含义是**验证�
 | `Int` / `Ind` / `Val` / `E` | 0、1、2 | 整数 |
 | `Bool` | false、true | 布尔 |
 | `Tab` | 4 个映射实例 | `new` / `add` / `lookup` / `size` / `isEmpty` |
-| `C` / `Q` / `Container` / `Str` | 5 个序列实例 | `empty` / `insert` / `head` / `tail` / `count` / `-\|` / `∈` / `∉` |
+| `C` / `Q` / `Container` / `Str` | 5 个序列实例 | `empty` / `insert`（有序插入）/ `head` / `tail` / `count` / `-\|` / `∈` / `∉` |
 
 每条等式/推论给出三种结论：
 
@@ -149,13 +149,17 @@ LSL 是声明式规格，没有执行语义。「运行」的含义是**验证�
 而不是判为失败或无法求值。`⇒`、`∧`、`∨` 做短路求值，避免 `~isEmpty(c) ⇒ count(head(c), c) > 0` 这类
 守卫式推论在 `c = empty` 时被误报。
 
-> 例：Container 的 6 条定义等式全部通过（第 6 条跳过 9 个空序列取值），`~isEmpty(c) ⇒ count(head(c), c) > 0`
+> 例 1：Container 的 6 条定义等式全部通过（第 6 条跳过 9 个空序列取值），`~isEmpty(c) ⇒ count(head(c), c) > 0`
 > 推论通过，判决为「规格自洽」。把 `count(e, empty) == 0` 改成 `== 1`，判决立即变为「规格矛盾」。
+>
+> 例 2：PQueue 的 `head(insert(e, q))` / `tail(insert(e, q))` 两条定义通过，推论 `e ∈ q ⇒ e ≥ head(q)`
+> 通过，判决为「规格自洽」。模型中的 `insert` 采用**有序插入**——Container 不约束顺序，PQueue 要求
+> `head` 为最小元素，有序插入同时满足两者；若改成普通头插，PQueue 的两条定义立即出现反例。
 
 ## 七、开发
 
 ```powershell
-.\mvnw.cmd test        # 运行全部测试（64 个）
+.\mvnw.cmd test        # 运行全部测试（69 个）
 .\mvnw.cmd compile     # 只编译
 .\mvnw.cmd clean       # 清理 target/
 ```

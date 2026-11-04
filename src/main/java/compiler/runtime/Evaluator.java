@@ -136,9 +136,19 @@ public final class Evaluator {
         }
         int item = ((Value.IntVal) args.get(0)).value();
         Value.ListVal list = (Value.ListVal) args.get(1);
+        // 有序插入：Container 不约束顺序，PQueue 要求 head 为最小元素，有序插入同时满足两者
         List<Integer> items = new ArrayList<>();
-        items.add(item);
-        items.addAll(list.items());
+        boolean placed = false;
+        for (int value : list.items()) {
+            if (!placed && item <= value) {
+                items.add(item);
+                placed = true;
+            }
+            items.add(value);
+        }
+        if (!placed) {
+            items.add(item);
+        }
         return new Value.ListVal(items);
     }
 
