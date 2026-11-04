@@ -69,14 +69,12 @@ class ContainerModelTest {
     }
 
     @Test
-    @DisplayName("head/tail 作用于空序列时记为无法求值，而不是通过")
-    void headTailOnEmptyIsUnknown() {
+    @DisplayName("head/tail 作用于空序列时按 LSL 惯例跳过该取值，而不是判失败")
+    void headTailOnEmptyIsSkipped() {
         List<CheckResult> results = results();
         CheckResult last = results.get(5);
-        assertEquals(CheckResult.Status.UNKNOWN, last.status(),
-                () -> last.summarize());
-        assertTrue(last.message().contains("head") || last.message().contains("insert"),
-                () -> last.message());
+        assertEquals(CheckResult.Status.PASS, last.status(), () -> last.summarize());
+        assertTrue(last.skipped() > 0, "应当有因未定义而跳过的取值");
     }
 
     @Test

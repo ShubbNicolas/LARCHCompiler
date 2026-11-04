@@ -52,6 +52,9 @@ public final class Evaluator {
             if (cond instanceof Value.BoolVal b) {
                 return eval(b.value() ? c.whenTrue() : c.whenFalse(), env);
             }
+            if (cond instanceof Value.Undefined) {
+                return cond;
+            }
             return new Value.Unknown("if 条件不是布尔值");
         }
         return new Value.Unknown("未知表达式节点");
@@ -76,6 +79,9 @@ public final class Evaluator {
             Value v = eval(arg, env);
             if (v instanceof Value.Unknown) {
                 return v;
+            }
+            if (v instanceof Value.Undefined) {
+                return v;   // 未定义向调用结果传播
             }
             args.add(v);
         }
@@ -202,16 +208,42 @@ public final class Evaluator {
     // ---- 运算符 ----
 
     private static Value infix(Ast.Infix infix, Map<String, Value> env) {
+        String op = infix.operator();
+
         Value left = eval(infix.left(), env);
         if (left instanceof Value.Unknown) {
             return left;
         }
+        // 短路：false ⇒ x、false ∧ x、true ∨ x 都不需要求右侧
+        if (left instanceof Value.BoolVal lb) {
+            if ("⇒".equals(op) && !lb.value()) {
+                return new Value.BoolVal(true);
+            }
+            if ("∧".equals(op) && !lb.value()) {
+                return new Value.BoolVal(false);
+            }
+            if ("∨".equals(op) && lb.value()) {
+                return new Value.BoolVal(true);
+            }
+        }
+
         Value right = eval(infix.right(), env);
         if (right instanceof Value.Unknown) {
             return right;
         }
 
-        String op = infix.operator();
+        // 相等比较对「未定义」也成立：⊥ == ⊥
+        if ("==".equals(op) || "=".equals(op) || "≠".equals(op)) {
+            boolean equal = same(left, right);
+            boolean wantEqual = !"≠".equals(op);
+            return new Value.BoolVal(wantEqual == equal);
+        }
+
+        // 其余运算遇到未定义时向下传播
+        if (left instanceof Value.Undefined || right instanceof Value.Undefined) {
+            return new Value.Undefined("运算数未定义");
+        }
+
         switch (op) {
             case "∧", "∨" -> {
                 if (left instanceof Value.BoolVal l && right instanceof Value.BoolVal r) {
@@ -224,11 +256,6 @@ public final class Evaluator {
                     return new Value.BoolVal(!l.value() || r.value());
                 }
                 return new Value.Unknown("⇒ 需要布尔操作数");
-            }
-            case "==", "=", "≠" -> {
-                boolean equal = same(left, right);
-                boolean wantEqual = !"≠".equals(op);
-                return new Value.BoolVal(wantEqual == equal);
             }
             case "∈", "∉" -> {
                 boolean contains = contains(left, right);

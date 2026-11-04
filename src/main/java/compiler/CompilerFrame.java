@@ -856,14 +856,16 @@ public class CompilerFrame extends JFrame{
 				appendConsole("语法错误，已中止检查，详见「错误列表」。\n");
 				return;
 			}
-			boolean anyFailed = false;
+			boolean anyBad = false;
 			for (compiler.parser.Ast.Trait trait : parsed.traits()) {
-				appendConsole("== " + trait.name() + " ==\n");
-				List<CheckResult> results = EquationChecker.check(trait);
-				appendConsole(EquationChecker.report(results));
-				anyFailed |= results.stream().anyMatch(r -> r.status() != CheckResult.Status.PASS);
+				compiler.runtime.EquationChecker.SpecReport report =
+						EquationChecker.checkSpec(trait);
+				appendConsole(report.render());
+				appendConsole("\n");
+				anyBad |= report.verdict()
+						!= compiler.runtime.EquationChecker.SpecReport.Verdict.CONSISTENT;
 			}
-			if (anyFailed) {
+			if (anyBad) {
 				proAndConPanel.setSelectedIndex(1);
 			}
 		}		// 词法分析：把当前编辑区的 token 填进右侧「词法分析」表
