@@ -145,6 +145,11 @@ public class CompilerFrame extends JFrame{
 	/* 查找次数 */
 	private static int time = 0;
 	private JTabbedPane tabbedPanel;
+	/* 三块主区域，供窗口缩放时重新布局 */
+	private JPanel fileScanPanel;
+	private JPanel editPanel;
+	private JPanel editLabelPanel;
+	private JPanel resultPanel;
 	/* 用户输入 */
 	private String userInput;
 	/* 控制台列数 */
@@ -420,7 +425,7 @@ public class CompilerFrame extends JFrame{
 				});
 
 				// 资源管理区(文件目录浏览区)
-				JPanel fileScanPanel = new JPanel(new BorderLayout());
+				fileScanPanel = new JPanel(new BorderLayout());
 				JLabel fileLabel = new JLabel("资源管理器");
 				JPanel fileLabelPanel = new JPanel(new BorderLayout());
 				JTextArea introductionArea = new JTextArea("\nLARCH编译器：\n");
@@ -459,11 +464,11 @@ public class CompilerFrame extends JFrame{
 				});
 				map.put(scrollPane, editor);
 				editTabbedPane.add(scrollPane, "LARCHTest" + ".lsl");
-				JPanel editPanel = new JPanel(null);
+				editPanel = new JPanel(null);
 				editPanel.setBackground(getBackground());
 				editPanel.setForeground(new Color(238, 238, 238));
 				JLabel editLabel = new JLabel("|LARCH程序文本编辑区");
-				JPanel editLabelPanel = new JPanel(new BorderLayout());
+				editLabelPanel = new JPanel(new BorderLayout());
 				editLabel.setFont(LABELFONT);
 				editLabelPanel.add(editLabel, BorderLayout.WEST);
 				editLabelPanel.setBackground(Color.LIGHT_GRAY);
@@ -501,7 +506,7 @@ public class CompilerFrame extends JFrame{
 				tabbedPanel.setFont(treeFont);
 				tabbedPanel.add(lexerPanel, "词法分析");
 				tabbedPanel.add(parserPanel, "语法分析");
-				JPanel resultPanel = new JPanel(new BorderLayout());
+				resultPanel = new JPanel(new BorderLayout());
 				JLabel resultLabel = new JLabel("|分析结果显示区");
 				JPanel resultLabelPanel = new JPanel(new BorderLayout());
 				resultLabel.setFont(LABELFONT);
@@ -1141,16 +1146,65 @@ public class CompilerFrame extends JFrame{
 			consoleArea.setForeground(c);
 			consoleArea.setEditable(edit);
 		}
-		// 主函数
-	public static void main(String[] args) {
-		System.out.println("111111");
-		CompilerFrame frame = new CompilerFrame("LARCH解释器");
-		System.out.println("111111");
-		frame.setBounds(60, 0, 1240, 742);
-		frame.setResizable(false);
-		frame.setVisible(true);
-		// TODO Auto-generated method stub
+		/**
+	 * 按窗口当前尺寸重新计算三块主区域以及工具条、状态条的位置。
+	 *
+	 * <p>界面采用 null 布局，窗口缩放时必须显式重算，否则组件不会跟随。</p>
+	 */
+	public void layoutPanels() {
+		int w = getContentPane().getWidth();
+		int h = getContentPane().getHeight();
+		if (w <= 0 || h <= 0) {
+			return;
+		}
+		int toolbarH = 33;
+		int statusH = Math.max(20, STATUSBAR.getHeight());
+		int bodyH = Math.max(240, h - toolbarH - statusH);
+		int sideW = 195;
+		int resultW = Math.max(300, Math.min(430, w / 3));
+		int editW = Math.max(320, w - sideW - resultW);
 
+		TOOLBAR.setBounds(0, 0, w, toolbarH);
+		if (fileScanPanel != null) {
+			fileScanPanel.setBounds(0, toolbarH, sideW, bodyH);
+		}
+		if (editPanel != null) {
+			editPanel.setBounds(sideW, toolbarH, editW, bodyH);
+			int labelH = 15;
+			int consoleH = Math.max(120, Math.min(220, bodyH / 4));
+			int editorH = Math.max(120, bodyH - labelH - consoleH);
+			if (editLabelPanel != null) {
+				editLabelPanel.setBounds(0, 0, editW, labelH);
+			}
+			if (editTabbedPane != null) {
+				editTabbedPane.setBounds(0, labelH, editW, editorH);
+			}
+			if (proAndConPanel != null) {
+				proAndConPanel.setBounds(0, labelH + editorH, editW, consoleH);
+			}
+		}
+		if (resultPanel != null) {
+			resultPanel.setBounds(sideW + editW, toolbarH, resultW, bodyH);
+		}
+		STATUSBAR.setBounds(0, toolbarH + bodyH, w, statusH);
+		revalidate();
+	}
+
+	// 主函数
+	public static void main(String[] args) {
+		CompilerFrame frame = new CompilerFrame("LARCH解释器");
+		frame.setBounds(60, 0, 1240, 742);
+		frame.setMinimumSize(new Dimension(960, 640));
+		frame.setResizable(true);
+		frame.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				frame.layoutPanels();
+			}
+		});
+		frame.layoutPanels();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 	}
 
 }
