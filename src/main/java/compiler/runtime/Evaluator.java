@@ -14,7 +14,7 @@ import java.util.Map;
  * <ul>
  *   <li>Tab（映射）：{@code new} / {@code add} / {@code lookup} / {@code size} / {@code isEmpty}</li>
  *   <li>序列（容器与字符串）：{@code empty} / {@code insert} / {@code head} / {@code tail} /
- *       {@code count} / {@code -|} / {@code ∈} / {@code ∉}</li>
+ *       {@code count} / {@code ∈} / {@code ∉}</li>
  * </ul>
  *
  * <p>未实现的算子返回 {@link Value.Unknown}，不会被当作通过。</p>
@@ -301,15 +301,7 @@ public final class Evaluator {
                 boolean contains = contains(left, right);
                 return new Value.BoolVal("∈".equals(op) == contains);
             }
-            case "-|" -> {
-                if (left instanceof Value.IntVal head && right instanceof Value.ListVal tail) {
-                    List<Integer> items = new ArrayList<>();
-                    items.add(head.value());
-                    items.addAll(tail.items());
-                    return new Value.ListVal(items);
-                }
-                return new Value.Unknown("-| 需要 (整数, 序列)");
-            }
+
             case "<", ">", "<=", ">=", "≤", "≥" -> {
                 if (left instanceof Value.IntVal l && right instanceof Value.IntVal r) {
                     boolean result = switch (op) {
@@ -348,23 +340,10 @@ public final class Evaluator {
         if (left instanceof Value.IntVal element && right instanceof Value.ListVal list) {
             return list.items().contains(element.value());
         }
-        if (left instanceof Value.ListVal sub && right instanceof Value.ListVal list) {
-            return isSubsequence(sub.items(), list.items());
-        }
+
         return false;
     }
 
-    private static boolean isSubsequence(List<Integer> sub, List<Integer> list) {
-        if (sub.isEmpty()) {
-            return true;
-        }
-        for (int start = 0; start + sub.size() <= list.size(); start++) {
-            if (list.subList(start, start + sub.size()).equals(sub)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /** 结构相等：Undefined 只与 Undefined 相等。 */
     public static boolean same(Value a, Value b) {

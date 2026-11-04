@@ -187,7 +187,7 @@ public final class Lexer {
      * 匹配运算符：优先匹配双字符运算符，再退化为单字符。
      */
     private String matchOperator() {
-        String[] twoChar = {"==", "=>", "->", "-|", "<=", ">=", "!="};
+        String[] twoChar = {"==", "=>", "->", "<=", ">=", "!="};
         for (String op : twoChar) {
             if (src.startsWith(op, pos)) {
                 advanceBy(2);

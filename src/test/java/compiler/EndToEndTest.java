@@ -33,8 +33,8 @@ class EndToEndTest {
     @Test
     @DisplayName("四个样例文件全部通过词法与语法分析")
     void allSamplesParse() throws IOException {
-        for (String name : List.of("Table1.lsl", "OrderedString.lsl",
-                "ContainerPQueue.lsl", "PairwiseExtension.lsl")) {
+        for (String name : List.of("Table1.lsl",
+                "ContainerPQueue.lsl", "PairwiseExtension.lsl", "Bag2.lsl")) {
             String source = sample(name);
 
             LexResult lex = Lexer.tokenize(source);

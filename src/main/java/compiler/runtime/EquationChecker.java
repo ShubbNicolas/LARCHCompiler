@@ -40,7 +40,7 @@ public final class EquationChecker {
     public static SpecReport checkSpec(Ast.Trait trait) {
         if (trait == null) {
             return new SpecReport("(无)", List.of(), List.of(), List.of(), List.of(),
-                    SpecReport.Verdict.UNVERIFIABLE);
+                    List.of(), SpecReport.Verdict.UNVERIFIABLE);
         }
 
         Ast.Introduces intro = find(trait, Ast.Introduces.class);
@@ -65,8 +65,10 @@ public final class EquationChecker {
                 ? List.of()
                 : converts.operators().stream().map(Ast.Ref::name).toList();
 
+        List<StructureCheck.Finding> findings = StructureCheck.check(trait);
+
         return new SpecReport(trait.name(), operators, assertResults, impliesResults,
-                convertNames, verdictOf(assertResults, impliesResults));
+                convertNames, findings, verdictOf(assertResults, impliesResults));
     }
 
     private static SpecReport.Verdict verdictOf(List<CheckResult> asserts, List<CheckResult> implies) {
@@ -198,7 +200,8 @@ public final class EquationChecker {
     /** 规格检查报告。 */
     public record SpecReport(String traitName, List<String> operators,
                              List<CheckResult> asserts, List<CheckResult> implies,
-                             List<String> converts, Verdict verdict) {
+                             List<String> converts, List<StructureCheck.Finding> findings,
+                             Verdict verdict) {
 
         public enum Verdict {
             /** asserts 与 implies 在枚举范围内均成立 */
@@ -214,6 +217,7 @@ public final class EquationChecker {
             asserts = List.copyOf(asserts);
             implies = List.copyOf(implies);
             converts = List.copyOf(converts);
+            findings = List.copyOf(findings);
         }
 
         public String render() {
@@ -240,6 +244,16 @@ public final class EquationChecker {
 
             if (!converts.isEmpty()) {
                 sb.append("  converts: ").append(String.join(", ", converts)).append('\n');
+            }
+
+            sb.append("  结构检查（introduces ↔ asserts）: ");
+            if (findings.isEmpty()) {
+                sb.append("声明与定义一致\n");
+            } else {
+                sb.append(findings.size()).append(" 条警告\n");
+                for (StructureCheck.Finding finding : findings) {
+                    sb.append("    - ").append(finding).append('\n');
+                }
             }
 
             sb.append("  结论: ").append(verdictText()).append('\n');
