@@ -33,7 +33,7 @@ public class CompilerFrame extends JFrame{
 	/* 状态条 */
 	private final static JStatusBar STATUSBAR = new JStatusBar();
 	/* 窗体菜单栏 */
-	private final static JMenuBar MENUBAR = new JMenuBar();
+	private final JMenuBar MENUBAR = new JMenuBar();
 	/* 窗体工具条 */
 	private final static JToolBar TOOLBAR = new JToolBar();
 	/* 文件浏览树 */
@@ -48,17 +48,17 @@ public class CompilerFrame extends JFrame{
 	/* 语法分析结果显示区字体 */
 	private Font treeFont = new Font("微软雅黑", Font.PLAIN, 12);
 	/* 文件菜单 */
-	private static JMenu fileMenu;
+	private JMenu fileMenu;
 	/* 编辑菜单 */
-	private static JMenu editMenu;
+	private JMenu editMenu;
 	/* 运行菜单 */
-	private static JMenu runMenu;
+	private JMenu runMenu;
 	/* 格式菜单 */
-	private static JMenu setMenu;
+	private JMenu setMenu;
 	/* 窗口菜单 */
-	private static JMenu windowMenu;
+	private JMenu windowMenu;
 	/* 帮助菜单 */
-	private static JMenu helpMenu;
+	private JMenu helpMenu;
 	/* 控制台和错误信息 */
 	public static JTabbedPane proAndConPanel;
 	/* CMM程序文本编辑区 */
@@ -76,9 +76,8 @@ public class CompilerFrame extends JFrame{
 	private static final JTextArea PARSE_AREA = new JTextArea();
 	/* 保存和打开对话框 */
 	private FileDialog filedialog_save, filedialog_load;
-	/* Undo管理器 */
-	private final UndoManager undo = new UndoManager();
-	//private UndoableEditListener undoHandler = new UndoHandler();
+	/* 每个编辑区对应一个撤销管理器（共用会导致跨标签页撤销错乱） */
+	private final java.util.Map<StyleEditor, UndoManager> undoManagers = new HashMap<>();
 	/* 编辑区右键菜单 */
 	private JPopupMenu popupMenu = new JPopupMenu();
 	private JMenuItem item1;
@@ -103,7 +102,6 @@ public class CompilerFrame extends JFrame{
 	private JMenuItem runItem;
 	private JMenuItem fontItem;
 	private JMenuItem startPageItem;
-	private JMenuItem newWindowItem;
 	private JMenuItem helpItem;
 	private JMenuItem aboutItem;
 	/* 工具条按钮 */
@@ -136,14 +134,6 @@ public class CompilerFrame extends JFrame{
 			return false;
 		}
 	};
-	/* 保存要查找的字符串 */
-	private static String findStr = null;
-	/* 当前文本编辑区字符串 */
-	private static String text = null;
-	/* 当前选择的文本的位置 */
-	private static int position;
-	/* 查找次数 */
-	private static int time = 0;
 	private JTabbedPane tabbedPanel;
 	/* 三块主区域，供窗口缩放时重新布局 */
 	private JPanel fileScanPanel;
@@ -298,12 +288,20 @@ public class CompilerFrame extends JFrame{
 				.getResource("/images/startpage.png")));
 		startPageItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 				ActionEvent.ALT_MASK));
-		newWindowItem = new JMenuItem("新建窗口", new ImageIcon(getClass()
-				.getResource("/images/window.png")));
-		newWindowItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-				ActionEvent.CTRL_MASK));
+
 		windowMenu.add(startPageItem);
-		windowMenu.add(newWindowItem);
+		startPageItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (editTabbedPane.getTabCount() > 0) {
+					editTabbedPane.setSelectedIndex(0);
+					StyleEditor first = currentEditor();
+					if (first != null) {
+						first.requestFocusInWindow();
+					}
+				}
+			}
+		});
+
 
 		// 为帮助菜单添加子项
 		helpItem = new JMenuItem("帮 助", new ImageIcon(getClass().getResource(
@@ -445,6 +443,16 @@ public class CompilerFrame extends JFrame{
 				// LARCH文本编辑区
 				editTabbedPane = new JCloseableTabbedPane();
 				editTabbedPane.setFont(treeFont);
+				// 关闭标签时同步清理编辑器与撤销管理器的引用
+				editTabbedPane.addContainerListener(new ContainerAdapter() {
+					@Override
+					public void componentRemoved(ContainerEvent e) {
+						StyleEditor removed = map.remove(e.getChild());
+						if (removed != null) {
+							undoManagers.remove(removed);
+						}
+					}
+				});
 
 				final StyleEditor editor = new StyleEditor();
 				editor.setFont(font);
@@ -454,7 +462,7 @@ public class CompilerFrame extends JFrame{
 
 				editor.addMouseListener(new DefaultMouseAdapter());
 				editor.addCaretListener(new StatusListener());
-				//editor.getDocument().addUndoableEditListener(undoHandler);
+				attachUndo(editor);
 				// 获得默认焦点
 				addWindowListener(new WindowAdapter() {
 					public void windowOpened(WindowEvent evt) {
@@ -528,35 +536,17 @@ public class CompilerFrame extends JFrame{
 				FILETREE.setFont(treeFont);
 				FILETREE.addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
-						if (e.getClickCount() == 2) {
-							String str = "", fileName = "";
-							StringBuilder text = new StringBuilder();
-							File file = FILETREE.getSelectFile();
-							fileName = file.getName();
-							if (file.isFile()) {
-								if (fileName.endsWith(".lsl")
-										|| fileName.endsWith(".LSL")
-										|| fileName.endsWith(".txt")
-										|| fileName.endsWith(".TXT")
-										|| fileName.endsWith(".java")) {
-									try {
-										FileReader file_reader = new FileReader(file);
-										BufferedReader in = new BufferedReader(
-												file_reader);
-										while ((str = in.readLine()) != null)
-											text.append(str + '\n');
-										in.close();
-										file_reader.close();
-									} catch (IOException e2) {
-									}
-									create(fileName);
-									editTabbedPane.setTitleAt(editTabbedPane
-											.getComponentCount() - 1, fileName);
-									map.get(editTabbedPane.getSelectedComponent())
-											.setText(text.toString());
-								}
-							}
-							setSize(getWidth(), getHeight());
+						if (e.getClickCount() != 2) {
+							return;
+						}
+						File file = FILETREE.getSelectFile();
+						if (file == null || !file.isFile()) {
+							return;
+						}
+						String name = file.getName().toLowerCase();
+						if (name.endsWith(".lsl") || name.endsWith(".txt")
+								|| name.endsWith(".java")) {
+							openFile(file);
 						}
 					}
 				});
@@ -694,7 +684,7 @@ public class CompilerFrame extends JFrame{
 				});
 				helpItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						JOptionPane.showMessageDialog(new JOptionPane(),
+						JOptionPane.showMessageDialog(CompilerFrame.this,
 								"这是一个简单的LARCH语言编译器，可以对LARCH\n程序文件进行编辑、"
 										+ "词法分析、语法分析，并可以\n进行编译、运行和输出程序结果， "
 										+ "同时还实现了\n对程序进行出错检查的功能.", "帮助",
@@ -703,8 +693,11 @@ public class CompilerFrame extends JFrame{
 				});
 				aboutItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						JOptionPane.showMessageDialog(new JOptionPane(),
-								 JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(CompilerFrame.this,
+								"LARCH 编译器 1.1.1\n\n"
+										+ "LSL 规格语言的编辑、词法分析、语法分析与规格一致性检查工具。\n"
+										+ "支持 introduces / asserts / implies 的语义验证与结构检查。",
+								"关于", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 				// 为右键菜单添加事件监听器
@@ -797,7 +790,7 @@ public class CompilerFrame extends JFrame{
 				});
 				helpButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						JOptionPane.showMessageDialog(new JOptionPane(),
+						JOptionPane.showMessageDialog(CompilerFrame.this,
 								"这是一个简单的LARCH语言编译器，可以对LARCH\n程序文件进行编辑、"
 										+ "词法分析、语法分析，并可以\n进行编译、运行和输出程序结果， "
 										+ "同时还实现了\n对程序进行出错检查的功能.", "帮助",
@@ -806,8 +799,11 @@ public class CompilerFrame extends JFrame{
 				});
 				aboutButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						JOptionPane.showMessageDialog(new JOptionPane(),
-								 JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(CompilerFrame.this,
+								"LARCH 编译器 1.1.1\n\n"
+										+ "LSL 规格语言的编辑、词法分析、语法分析与规格一致性检查工具。\n"
+										+ "支持 introduces / asserts / implies 的语义验证与结构检查。",
+								"关于", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 			}
@@ -820,17 +816,13 @@ public class CompilerFrame extends JFrame{
 		}
 	}
 
-	// 内部类：Undo管理
-	class UndoHandler implements UndoableEditListener {
-		public void undoableEditHappened(UndoableEditEvent e) {
-			undo.addEdit(e.getEdit());
-		}
-	}
-
 	// 内部类：控制状态条的显示
 	class StatusListener implements CaretListener {
 		public void caretUpdate(CaretEvent e) {
 			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
+			if (temp == null) {
+				return;                         // 所有标签页都已关闭
+			}
 			try {
 				int row = temp.getLineOfOffset(e.getDot());
 				int column = e.getDot() - temp.getLineStartOffset(row);
@@ -921,8 +913,26 @@ public class CompilerFrame extends JFrame{
 
 		/** 当前选中标签页的文本；没有打开文件时返回 null。 */
 		private String currentSource() {
-			StyleEditor editor = map.get(editTabbedPane.getSelectedComponent());
+			StyleEditor editor = currentEditor();
 			return editor == null ? null : editor.getText();
+		}
+
+		/** 当前选中标签页的编辑区；没有打开文件时返回 null。 */
+		private StyleEditor currentEditor() {
+			Component selected = editTabbedPane.getSelectedComponent();
+			return selected == null ? null : map.get(selected);
+		}
+
+		/** 为编辑区挂上独立的撤销管理器。 */
+		private void attachUndo(StyleEditor editor) {
+			UndoManager manager = new UndoManager();
+			editor.getDocument().addUndoableEditListener(manager);
+			undoManagers.put(editor, manager);
+		}
+
+		private UndoManager currentUndo() {
+			StyleEditor editor = currentEditor();
+			return editor == null ? null : undoManagers.get(editor);
 		}
 
 		private void appendConsole(String text) {
@@ -946,13 +956,21 @@ public class CompilerFrame extends JFrame{
 		// 新建
 		private void create(String filename) {
 			if (filename == null) {
-				filename = JOptionPane.showInputDialog("请输入新建文件的名字.(后缀名为.lsl)");
-				if (filename == null || filename.equals("")) {
-					JOptionPane.showMessageDialog(null, "文件名不能为空!");
+				String input = JOptionPane.showInputDialog(this,
+						"请输入新建文件的名字（无需后缀）");
+				if (input == null) {
+					return;                     // 用户取消
+				}
+				input = input.trim();
+				if (input.isEmpty()) {
+					JOptionPane.showMessageDialog(this, "文件名不能为空！");
 					return;
 				}
+				filename = input;
 			}
-			filename += ".lsl";
+			if (!filename.toLowerCase().endsWith(".lsl")) {
+				filename += ".lsl";
+			}
 			StyleEditor editor = new StyleEditor();
 			editor.setFont(font);
 			JScrollPane scrollPane = new JScrollPane(editor);
@@ -961,154 +979,189 @@ public class CompilerFrame extends JFrame{
 
 			editor.addMouseListener(new DefaultMouseAdapter());
 			editor.addCaretListener(new StatusListener());
+			attachUndo(editor);
 			map.put(scrollPane, editor);
 			editTabbedPane.add(scrollPane, filename);
 			editTabbedPane.setSelectedIndex(editTabbedPane.getTabCount() - 1);
+			editor.requestFocusInWindow();
 		}
 
 		// 打开
 		private void open() {
-			boolean isOpened = false;
-			String str = "", fileName = "";
-			File file = null;
-			StringBuilder text = new StringBuilder();
 			filedialog_load.setVisible(true);
-			if (filedialog_load.getFile() != null) {
-				try {
-					file = new File(filedialog_load.getDirectory(), filedialog_load
-							.getFile());
-					fileName = file.getName();
-					FileReader file_reader = new FileReader(file);
-					BufferedReader in = new BufferedReader(file_reader);
-					while ((str = in.readLine()) != null)
-						text.append(str + '\n');
-					in.close();
-					file_reader.close();
-				} catch (IOException e2) {
-				}
-				for (int i = 0; i < editTabbedPane.getComponentCount(); i++) {
-					if (editTabbedPane.getTitleAt(i).equals(fileName)) {
-						isOpened = true;
-						editTabbedPane.setSelectedIndex(i);
-					}
-				}
-				if (!isOpened) {
-					create(fileName);
-					editTabbedPane.setTitleAt(
-							editTabbedPane.getComponentCount() - 1, fileName);
-					map.get(editTabbedPane.getSelectedComponent()).setText(
-							text.toString());
-				}
-
+			String chosen = filedialog_load.getFile();
+			if (chosen == null) {
+				return;
 			}
+			openFile(new File(filedialog_load.getDirectory(), chosen));
+		}
+
+		/** 在标签页中打开文件；已经打开过就切换到该标签。 */
+		private void openFile(File file) {
+			String fileName = file.getName();
+			for (int i = 0; i < editTabbedPane.getTabCount(); i++) {
+				if (editTabbedPane.getTitleAt(i).equals(fileName)) {
+					editTabbedPane.setSelectedIndex(i);
+					return;
+				}
+			}
+			String content;
+			try {
+				content = readText(file);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, "打开文件失败：" + e.getMessage());
+				return;
+			}
+			create(fileName);
+			StyleEditor editor = currentEditor();
+			if (editor != null) {
+				editor.setText(content);
+				editor.setCaretPosition(0);
+				UndoManager manager = undoManagers.get(editor);
+				if (manager != null) {
+					manager.discardAllEdits();  // 打开文件不应成为可撤销操作
+				}
+			}
+		}
+
+		/** 读取源文件：优先 UTF-8，失败时依次尝试 GBK 与系统默认编码。 */
+		private static String readText(File file) throws IOException {
+			byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
+			java.nio.charset.CharsetDecoder decoder =
+					java.nio.charset.StandardCharsets.UTF_8.newDecoder()
+							.onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+							.onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT);
+			try {
+				return decoder.decode(java.nio.ByteBuffer.wrap(bytes)).toString();
+			} catch (java.nio.charset.CharacterCodingException ignored) {
+				// 继续尝试兼容编码
+			}
+			for (String name : new String[] { "GBK", "GB18030" }) {
+				try {
+					return java.nio.charset.Charset.forName(name).newDecoder()
+							.onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+							.decode(java.nio.ByteBuffer.wrap(bytes)).toString();
+				} catch (java.nio.charset.CharacterCodingException | RuntimeException ignored) {
+					// 该编码不可用或不匹配
+				}
+			}
+			return new String(bytes, java.nio.charset.Charset.defaultCharset());
 		}
 
 		// 保存
 		private void save() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			if (temp.getText() != null) {
-				filedialog_save.setVisible(true);
-				if (filedialog_save.getFile() != null) {
-					try {
-						File file = new File(filedialog_save.getDirectory(),
-								filedialog_save.getFile());
-						FileWriter fw = new FileWriter(file);
-						fw.write(map.get(editTabbedPane.getSelectedComponent())
-								.getText());
-						fw.close();
-					} catch (IOException e2) {
-					}
-				}
+			StyleEditor editor = currentEditor();
+			if (editor == null) {
+				return;
+			}
+			filedialog_save.setVisible(true);
+			String chosen = filedialog_save.getFile();
+			if (chosen == null) {
+				return;
+			}
+			File file = new File(filedialog_save.getDirectory(), chosen);
+			try {
+				java.nio.file.Files.writeString(file.toPath(), editor.getText(),
+						java.nio.charset.StandardCharsets.UTF_8);
+				appendConsole("已保存：" + file.getAbsolutePath() + "\n");
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, "保存文件失败：" + e.getMessage());
 			}
 		}
 
 		// 撤销
 		private void undo() {
-			if (undo.canUndo()) {
-				try {
-					undo.undo();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			UndoManager manager = currentUndo();
+			if (manager != null && manager.canUndo()) {
+				manager.undo();
 			}
 		}
 
 		// 重做
 		private void redo() {
-			if (undo.canRedo()) {
-				try {
-					undo.redo();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			UndoManager manager = currentUndo();
+			if (manager != null && manager.canRedo()) {
+				manager.redo();
 			}
 		}
 
 		// 复制
 		private void copy() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			temp.copy();
+			StyleEditor temp = currentEditor();
+			if (temp != null) {
+				temp.copy();
+			}
 		}
 
 		// 剪切
 		private void cut() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			temp.cut();
+			StyleEditor temp = currentEditor();
+			if (temp != null) {
+				temp.cut();
+			}
 		}
 
 		// 粘贴
 		private void paste() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			temp.paste();
+			StyleEditor temp = currentEditor();
+			if (temp != null) {
+				temp.paste();
+			}
 		}
 
 		// 查找
 		private void search() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			if (text == null)
-				text = temp.getText();
-			if (findStr == null)
-				findStr = JOptionPane.showInputDialog(this, "请输入要找的字符串!");
-			if (findStr != null) {
-				position = text.indexOf(findStr);
-				if (text.equals("")) {
-					JOptionPane.showMessageDialog(this, "没有你要查找的字符串！");
-					findStr = null;
-				} else {
-					if (position != -1) {
-						temp.select(position + findStr.length() * time, position
-								+ findStr.length() * (time + 1));
-						temp.setSelectedTextColor(Color.RED);
-						text = new String(text.substring(position
-								+ findStr.length()));
-						time += 1;
-					} else {
-						JOptionPane.showMessageDialog(this, "没有你要查找的字符串！");
-						time = 0;
-						text = null;
-						findStr = null;
-					}
-				}
+			StyleEditor temp = currentEditor();
+			if (temp == null) {
+				return;
 			}
+			String query = JOptionPane.showInputDialog(this, "请输入要查找的字符串！");
+			if (query == null || query.isEmpty()) {
+				return;
+			}
+			String content = temp.getText();
+			int from = Math.min(temp.getSelectionEnd(), content.length());
+			int index = content.indexOf(query, from);
+			if (index < 0) {
+				index = content.indexOf(query);      // 回绕到开头再找一次
+			}
+			if (index < 0) {
+				JOptionPane.showMessageDialog(this, "没有你要查找的字符串！");
+				return;
+			}
+			temp.requestFocusInWindow();
+			temp.select(index, index + query.length());
 		}
 
 		// 全选
 		private void selectAll() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			temp.selectAll();
+			StyleEditor temp = currentEditor();
+			if (temp != null) {
+				temp.selectAll();
+			}
 		}
 
 		// 删除
 		private void delete() {
-			StyleEditor temp = map.get(editTabbedPane.getSelectedComponent());
-			temp.replaceSelection("");
+			StyleEditor temp = currentEditor();
+			if (temp != null) {
+				temp.replaceSelection("");
+			}
 		}
 		// 设置字体
 		private void setFont() {
-			font = JFontDialog
-					.showDialog(getContentPane(), "字体设置", true, getFont());
-			for (int i = 0; i < editTabbedPane.getComponentCount(); i++)
-				map.get(editTabbedPane.getComponent(i)).setFont(font);
+			Font chosen = JFontDialog.showDialog(getContentPane(), "字体设置", true,
+					getFont());
+			if (chosen == null) {
+				return;
+			}
+			font = chosen;
+			for (int i = 0; i < editTabbedPane.getTabCount(); i++) {
+				StyleEditor editor = map.get(editTabbedPane.getComponentAt(i));
+				if (editor != null) {
+					editor.setFont(font);
+				}
+			}
 		}
 		private void getCurrenRowAndCol() {
 			int row = 0;
