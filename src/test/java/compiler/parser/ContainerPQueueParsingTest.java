@@ -135,7 +135,7 @@ class ContainerPQueueParsingTest {
         Ast.Trait pqueue = result().traits().get(1);
         Ast.Exempting exempting = (Ast.Exempting) pqueue.sections().get(5);
         assertEquals(2, exempting.cases().size());
-        assertEquals("head(empty)", exempting.cases().get(0).display());
+        assertEquals("head(empty)", TreePrinter.expr(exempting.cases().get(0)));
     }
 
     @Test

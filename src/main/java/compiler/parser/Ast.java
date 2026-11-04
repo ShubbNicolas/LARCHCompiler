@@ -89,8 +89,8 @@ public final class Ast {
     public record Converts(List<Ref> operators) implements Section {
     }
 
-    /** {@code exempting} 子句：豁免某些无定义情形。 */
-    public record Exempting(List<Ref> cases) implements Section {
+    /** {@code exempting} 子句：豁免某些无定义情形，可带量化变量。 */
+    public record Exempting(List<VarDecl> variables, List<Expr> cases) implements Section {
     }
 
     /**

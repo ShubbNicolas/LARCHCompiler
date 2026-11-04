@@ -85,10 +85,10 @@ public final class Parser {
             if (check(TokenType.LPAREN)) {
                 advance();
                 if (!check(TokenType.RPAREN)) {
-                    parameters.add(expect(TokenType.IDENT, "期望 trait 形参").lexeme());
+                    parameters.add(expectName("期望 trait 形参"));
                     while (check(TokenType.COMMA)) {
                         advance();
-                        parameters.add(expect(TokenType.IDENT, "期望 trait 形参").lexeme());
+                        parameters.add(expectName("期望 trait 形参"));
                     }
                 }
                 expect(TokenType.RPAREN, "期望 ')'");
@@ -117,7 +117,10 @@ public final class Parser {
                     sections.add(parseExempting());
                 } else if (keywordIs(token, "implies")) {
                     advance();
-                    if (looksLikeVarDecl()) {
+                    if (isSectionStart(peek()) || check(TokenType.EOF)) {
+                        // 空的 implies 块，如 PairwiseExtension 里紧随 converts
+                        sections.add(new Ast.Implies(List.of(), List.of()));
+                    } else if (looksLikeVarDecl()) {
                         sections.add(parseImpliesBody());
                     } else {
                         implied.add(parseRef());
@@ -201,14 +204,26 @@ public final class Parser {
     }
 
     private void parseRefArgument(List<String> args, List<Ast.Rename> renames) {
-        String first = expect(TokenType.IDENT, "期望实参").lexeme();
+        String first = expectName("期望实参");
         if (keywordIs(peek(), "for")) {
             advance();
-            String second = expect(TokenType.IDENT, "期望 'for' 之后的名称").lexeme();
+            String second = expectName("期望 'for' 之后的名称");
             renames.add(new Ast.Rename(first, second));
         } else {
             args.add(first);
         }
+    }
+
+    /** 接受标识符、关键字或运算符作为名称（如 {@code +}、{@code ⊗}、{@code Int}）。 */
+    private String expectName(String message) {
+        Token token = peek();
+        if (token.type() != TokenType.IDENT
+                && token.type() != TokenType.KEYWORD
+                && token.type() != TokenType.OPERATOR) {
+            throw new ParseException(token, message);
+        }
+        advance();
+        return token.lexeme();
     }
 
     /** {@code converts isEmpty, count}（已消费 converts 关键字）。 */
@@ -227,20 +242,31 @@ public final class Parser {
         return new Ast.Converts(operators);
     }
 
-    /** {@code exempting head(empty), tail(empty)}（已消费 exempting 关键字）。 */
+    /** {@code exempting} 子句：可带量化变量，后接逗号分隔的表达式列表。 */
     private Ast.Exempting parseExempting() {
-        List<Ast.Ref> cases = new ArrayList<>();
-        if (canStartRef()) {
-            cases.add(parseRef());
+        List<Ast.VarDecl> variables = new ArrayList<>();
+        if (looksLikeVarDecl()) {
+            variables.addAll(parseVarDecl());
+        }
+        List<Ast.Expr> cases = new ArrayList<>();
+        if (canStartExpr()) {
+            cases.add(parseExpr());
         }
         while (check(TokenType.COMMA)) {
             advance();
-            if (!canStartRef() || isSectionStart(peek())) {
+            if (!canStartExpr() || isSectionStart(peek())) {
                 break;
             }
-            cases.add(parseRef());
+            cases.add(parseExpr());
         }
-        return new Ast.Exempting(cases);
+        return new Ast.Exempting(variables, cases);
+    }
+
+    private boolean canStartExpr() {
+        TokenType type = peek().type();
+        return type == TokenType.IDENT || type == TokenType.KEYWORD
+                || type == TokenType.NUMBER || type == TokenType.STRING
+                || type == TokenType.LPAREN || type == TokenType.OPERATOR;
     }
 
     /** {@code implies} 公式块（已消费 implies 关键字）。 */
@@ -363,12 +389,19 @@ public final class Parser {
     }
 
     private Ast.Equation parseEquation() {
-        Ast.Expr left = parseExpr();
+        Ast.Expr expr = parseExpr();
+        Ast.Expr left;
         Ast.Expr right;
-        if (checkOperator("==")) {
+        if (expr instanceof Ast.Infix infix && "==".equals(infix.operator())) {
+            // 顶层就是 ==，直接拆成等式左右两侧
+            left = infix.left();
+            right = infix.right();
+        } else if (checkOperator("==")) {
             advance();
+            left = expr;
             right = parseExpr();
         } else {
+            left = expr;
             right = new Ast.Name("true");
         }
         if (check(TokenType.SEMICOLON)) {
@@ -398,12 +431,22 @@ public final class Parser {
         return parseImplication();
     }
 
-    /** 蕴含：{@code a ⇒ b}，右结合，优先级低于 ∨。 */
+    /** 蕴含：{@code a ⇒ b}，优先级低于等式。 */
     private Ast.Expr parseImplication() {
-        Ast.Expr left = parseOr();
+        Ast.Expr left = parseEquality();
         while (checkOperator("⇒")) {
             advance();
-            left = new Ast.Infix("⇒", left, parseOr());
+            left = new Ast.Infix("⇒", left, parseEquality());
+        }
+        return left;
+    }
+
+    /** 等式运算符 {@code ==}：作为表达式参与解析，优先级低于 ∨。 */
+    private Ast.Expr parseEquality() {
+        Ast.Expr left = parseOr();
+        while (checkOperator("==")) {
+            advance();
+            left = new Ast.Infix("==", left, parseOr());
         }
         return left;
     }
@@ -484,6 +527,9 @@ public final class Parser {
 
     private Ast.Expr parsePrimary() {
         Token token = peek();
+        if (keywordIs(token, "if")) {
+            return parseConditional();
+        }
         if (check(TokenType.NUMBER)) {
             advance();
             return new Ast.Num(Integer.parseInt(token.lexeme()));

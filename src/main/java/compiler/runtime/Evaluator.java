@@ -135,6 +135,15 @@ public final class Evaluator {
                 }
                 return new Value.Unknown(op + " 需要布尔操作数");
             }
+            case "⇒" -> {
+                if (left instanceof Value.BoolVal l && right instanceof Value.BoolVal r) {
+                    return new Value.BoolVal(!l.value() || r.value());
+                }
+                return new Value.Unknown("⇒ 需要布尔操作数");
+            }
+            case "==" -> {
+                return new Value.BoolVal(same(left, right));
+            }
             case "=", "≠" -> {
                 boolean equal = same(left, right);
                 return new Value.BoolVal("=".equals(op) == equal);

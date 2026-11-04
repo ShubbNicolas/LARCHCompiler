@@ -103,8 +103,12 @@ public final class TreePrinter {
         }
 
         if (section instanceof Ast.Exempting exempting) {
-            sb.append(indent).append(branch).append("exempting ")
-                    .append(joinRefs(exempting.cases())).append('\n');
+            sb.append(indent).append(branch).append("exempting");
+            if (!exempting.variables().isEmpty()) {
+                sb.append(' ').append(joinVarDecls(exempting.variables()));
+            }
+            sb.append(' ').append(exempting.cases().stream()
+                    .map(TreePrinter::expr).collect(Collectors.joining(", "))).append('\n');
             return;
         }
 
