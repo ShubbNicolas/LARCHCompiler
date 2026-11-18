@@ -40,6 +40,40 @@ jobs:
       - name: Run tests
         run: xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" ./mvnw -B -ntp verify
 
+      - name: Summarize test results
+        if: always()
+        env:
+          JDK_VERSION: ${{ matrix.java }}
+        run: |
+          python3 - <<'PY'
+          import glob
+          import os
+          import xml.etree.ElementTree as ET
+
+          total = failures = errors = skipped = 0
+          for report in sorted(glob.glob('target/surefire-reports/TEST-*.xml')):
+              attrs = ET.parse(report).getroot().attrib
+              total += int(attrs.get('tests', 0))
+              failures += int(attrs.get('failures', 0))
+              errors += int(attrs.get('errors', 0))
+              skipped += int(attrs.get('skipped', 0))
+
+          jdk = os.environ.get('JDK_VERSION', '?')
+          print(f'Tests run: {total}, Failures: {failures}, Errors: {errors}, Skipped: {skipped}')
+          print(f'::notice title=Surefire (JDK {jdk})::'
+                f'{total} tests, {failures} failures, {errors} errors, {skipped} skipped')
+
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('| JDK | Tests | Failures | Errors | Skipped |\n')
+              summary.write('|---|---:|---:|---:|---:|\n')
+              summary.write(f'| {jdk} | {total} | {failures} | {errors} | {skipped} |\n')
+
+          if total == 0:
+              raise SystemExit('no surefire reports found')
+          if failures or errors:
+              raise SystemExit(f'{failures} failures, {errors} errors')
+          PY
+
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
