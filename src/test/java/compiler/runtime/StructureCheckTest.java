@@ -6,6 +6,9 @@ import compiler.parser.Parser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -122,7 +125,21 @@ class StructureCheckTest {
     }
 
     @Test
-    @DisplayName("Table1 样例存在声明未定义的结构警告")
+    @DisplayName("Table1 样例：声明的算子都有定义，无结构警告")
+    void table1SampleHasNoFindings() throws IOException {
+        String source;
+        try (InputStream in = StructureCheckTest.class.getResourceAsStream("/samples/Table1.lsl")) {
+            assertNotNull(in, "样例不存在: Table1.lsl");
+            source = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        }
+        ParseResult parsed = Parser.parse(source);
+        assertFalse(parsed.hasErrors(), () -> "语法错误: " + parsed.errors());
+        List<StructureCheck.Finding> findings = StructureCheck.check(parsed.trait());
+        assertTrue(findings.isEmpty(), () -> String.valueOf(findings));
+    }
+
+    @Test
+    @DisplayName("精简版 Table1：声明未定义的算子会被逐条列出")
     void table1HasFindings() {
         Ast.Trait t = trait("""
                 Table1: trait
