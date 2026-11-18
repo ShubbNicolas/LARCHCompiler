@@ -241,12 +241,12 @@ public class JFileTree extends JTree implements Serializable {
 			if (!explored) {
 				explored = true;
 				File file = getFile();
-				// 濡傛灉杩欓噷浣跨敤 file.listFiles(filter) 鏈塀UG
+				// 如果这里使用 file.listFiles(filter) 有BUG
 				File[] children = file.listFiles();
 				if (children == null || children.length == 0) {
 					return;
 				}
-				// 杩囨护鍚庢帓搴�,閫夊姞鍏ユ帓搴忓悗鐨勭洰褰�, 鍐嶅姞鍏ユ帓搴忓悗鐨勬枃浠�
+				// 过滤后排序,先加入排序后的目录, 再加入排序后的文件
 				ArrayList<File> listDir = new ArrayList<File>();
 				ArrayList<File> listFile = new ArrayList<File>();
 				for (int i = 0; i < children.length; ++i) {
