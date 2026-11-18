@@ -5,6 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.awt.Color;
+
+import javax.swing.SwingUtilities;
+import javax.swing.text.Element;
+import javax.swing.text.StyleConstants;
+
 /**
  * 回归测试：编辑区在文本变更后必须保留内容。
  *
@@ -52,5 +58,21 @@ class StyleEditorTest {
     void editableByDefault() {
         StyleEditor editor = new StyleEditor();
         assertTrue(editor.isEditable());
+    }
+
+    @Test
+    @DisplayName("输入后自动应用语法着色")
+    void appliesSyntaxHighlighting() throws Exception {
+        StyleEditor[] holder = new StyleEditor[1];
+        SwingUtilities.invokeAndWait(() -> {
+            holder[0] = new StyleEditor();
+            holder[0].setText("trait Foo");
+        });
+        // 着色通过 invokeLater 合并执行，这里再排一个空任务确保它已跑完
+        SwingUtilities.invokeAndWait(() -> { });
+        StyleEditor editor = holder[0];
+        Element keyword = editor.getStyledDocument().getCharacterElement(1);
+        assertEquals(new Color(127, 0, 85),
+                StyleConstants.getForeground(keyword.getAttributes()));
     }
 }

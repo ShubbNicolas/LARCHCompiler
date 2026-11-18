@@ -6,6 +6,9 @@ import java.awt.FontMetrics;
 import java.awt.Insets;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
@@ -13,6 +16,7 @@ import javax.swing.text.Element;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 
@@ -33,12 +37,32 @@ public class StyleEditor extends JTextPane {
 
 	private final Style style = context.getStyle(StyleContext.DEFAULT_STYLE);
 
+	/** 合并同一轮事件里的多次编辑，避免每敲一个字符就重排整篇。 */
+	private boolean highlightPending;
+
 	public StyleEditor() {
 		setDocument(new DefaultStyledDocument());
 		setFont(new Font("Courier New", Font.PLAIN, 15));
 		setTabs(this, 4);
 		setMargin(new Insets(2, 0, 0, 0));
 		setEditable(true);
+		getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				scheduleHighlight();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				scheduleHighlight();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// 着色本身产生的属性变化不需要再次触发
+			}
+		});
+		scheduleHighlight();
 	}
 
 	public StyleEditor(boolean cmm) {
@@ -87,6 +111,21 @@ public class StyleEditor extends JTextPane {
 		}
 		TabSet tabSet = new TabSet(tabs);
 		StyleConstants.setTabSet(style, tabSet);
+	}
+
+	/** 在 EDT 上合并触发一次语法着色。 */
+	private void scheduleHighlight() {
+		if (highlightPending) {
+			return;
+		}
+		highlightPending = true;
+		SwingUtilities.invokeLater(() -> {
+			highlightPending = false;
+			Document document = getDocument();
+			if (document instanceof StyledDocument) {
+				codeStyle.highlight((StyledDocument) document);
+			}
+		});
 	}
 
 	@Override

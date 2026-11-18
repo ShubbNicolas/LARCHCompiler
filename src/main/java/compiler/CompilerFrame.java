@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.StyledDocument;
@@ -919,10 +920,16 @@ public class CompilerFrame extends JFrame{
 			return selected == null ? null : map.get(selected);
 		}
 
-		/** 为编辑区挂上独立的撤销管理器。 */
+		/** 为编辑区挂上独立的撤销管理器；只登记文本编辑，语法着色产生的属性修改不进撤销栈。 */
 		private void attachUndo(StyleEditor editor) {
 			UndoManager manager = new UndoManager();
-			editor.getDocument().addUndoableEditListener(manager);
+			editor.getDocument().addUndoableEditListener(event -> {
+				// 文本增删的 edit 类型是 INSERT/REMOVE；着色走 setCharacterAttributes，类型是 CHANGE
+				if (event.getEdit() instanceof AbstractDocument.DefaultDocumentEvent documentEdit
+						&& documentEdit.getType() != DocumentEvent.EventType.CHANGE) {
+					manager.addEdit(event.getEdit());
+				}
+			});
 			undoManagers.put(editor, manager);
 		}
 
