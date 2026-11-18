@@ -168,6 +168,7 @@ LSL 是声明式规格，没有执行语义。「运行」的含义是**验证�
 
 - 源码统一 **UTF-8**，`maven.compiler.release=17`
 - 测试位于 `src/test/java`，使用 JUnit 5
+- CI：`.github/workflows/ci.yml` 在 JDK 17 / 21 上运行全部测试；UI 测试在 Xvfb 虚拟显示下执行
 - 旧版逐行解析实现（`ReaderHelper`、`ExcuteProgram`、`IntroducesHelper`、`AssertsHelper`）与
   `src/test/java/test` 已在 1.1.3 清理删除
 
