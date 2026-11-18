@@ -13,17 +13,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.StyledDocument;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.undo.UndoManager;
 
-//import structure.TreeNode;
 import compiler.lexer.LexResult;
 import compiler.lexer.Lexer;
 import compiler.lexer.Token;
 import compiler.parser.ParseResult;
 import compiler.parser.Parser;
 import compiler.parser.TreePrinter;
-import compiler.runtime.CheckResult;
 import compiler.runtime.EquationChecker;
 import util.*;
 
@@ -588,7 +585,6 @@ public class CompilerFrame extends JFrame{
 						try {
 							userInput = doc.getText(index[0], index[1] - 1
 									- index[0]);
-							//semanticAnalysis.setUserInput(userInput);
 						} catch (BadLocationException e1) {
 							e1.printStackTrace();
 						}

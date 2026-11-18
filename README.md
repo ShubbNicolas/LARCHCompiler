@@ -68,12 +68,11 @@ AST
 
 | 包 | 职责 |
 |---|---|
-| `compiler` | `CompilerFrame` 主窗口；`ExcuteProgram`/`OpenFile` 为旧版遗留 |
+| `compiler` | `CompilerFrame` 主窗口：三个分析按钮的接线、菜单与布局 |
 | `compiler.lexer` | `Lexer`、`Token`、`TokenType`、`LexError`、`LexResult` |
 | `compiler.parser` | `Parser`、`Ast`、`TreePrinter`、`ParseError`、`ParseResult` |
 | `compiler.runtime` | `Evaluator`、`Domains`、`Value`、`EquationChecker`、`CheckResult` |
-| `util` | 编辑器与界面组件（`StyleEditor`、`JFileTree`、`JStatusBar` 等） |
-| `exceptions` | 自定义异常 |
+| `util` | 编辑器与界面组件（`StyleEditor`、`CodeStyle`、`JFileTree`、`JStatusBar` 等） |
 
 ## 五、支持的 LSL 子集
 
@@ -169,8 +168,8 @@ LSL 是声明式规格，没有执行语义。「运行」的含义是**验证�
 
 - 源码统一 **UTF-8**，`maven.compiler.release=17`
 - 测试位于 `src/test/java`，使用 JUnit 5
-- 旧版遗留类（`ReaderHelper`、`ExcuteProgram`、`IntroducesHelper`、`AssertsHelper` 及 `src/test/java/test`）
-  保留但仍未被界面使用，可后续清理
+- 旧版逐行解析实现（`ReaderHelper`、`ExcuteProgram`、`IntroducesHelper`、`AssertsHelper`）与
+  `src/test/java/test` 已在 1.1.3 清理删除
 
 ## 八、已知限制
 
@@ -178,4 +177,4 @@ LSL 是声明式规格，没有执行语义。「运行」的含义是**验证�
 - **等式检查是有限枚举**：不是定理证明，取值域之外的输入不覆盖；`Tab`/序列模型只是参考实现
 - **泛型 trait 无模型**：以运算符为形参的 trait 需要实例化后才能数值验证，单独给出时只能做结构检查
 - **语法高亮未启用**：`CodeStyle` 的关键字表仍被注释
-- **旧代码并存**：`util` 中的旧解析类未删除，避免破坏 `test` 包
+- **旧代码已清理**：`util` 中的旧解析类与 `src/test/java/test` 已删除，仓库只保留当前实现
